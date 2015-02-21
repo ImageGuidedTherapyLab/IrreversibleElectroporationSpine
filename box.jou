@@ -1,0 +1,21 @@
+##cubit -nographics -input box.jou -batch
+## play "box.jou
+reset
+brick x 25 y 25 z 25
+##move volume 1 location x 10 y 1 z 1
+volume 1 size 1.4
+volume 1 scheme tetmesh 
+mesh volume 1
+# sideset 3 surface 4
+# sideset 2 surface 6
+# sideset 4 surface 1 2 3 5
+# sideset 3 name "cauchy"
+# sideset 2 name "neumann"
+# sideset 4 name "noflux"
+#set large exodus file off
+skin volume all make group 7
+group 7 name "appface"
+nodeset 3 node in tri in group 7
+block 1 volume all 
+volume all scale 0.001
+export mesh "box.e" dimension 3 overwrite

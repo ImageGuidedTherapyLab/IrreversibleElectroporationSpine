@@ -1,0 +1,211 @@
+DMPlexApplications
+==================
+
+Configure options (Ubuntu 12.04):
+
+	apt-get install libnetcdf-dev
+	apt-get install libhdf5-serial-dev
+	apt-get install libexodusii-dev libexodusii5
+
+
+	./config/configure.py --with-shared-libraries --with-clanguage=c++ --CFLAGS='-g -O0' --CXXFLAGS='-g -O0' --download-ctetgen  --download-triangle --with-debugging=yes --with-blas-lapack-dir=/opt/apps/MKL/12.1/lib/intel64/  --with-exodusii-lib=[/usr/lib/x86_64-linux-gnu/libexoIIv2.so] --with-netcdf-dir=/usr/lib --with-hdf5-dir=/usr/lib --with-c2html=0 --with-exodusii-include=/usr/include  --with-opencl-include=/usr/include/ --with-opencl-lib=/usr/lib/libOpenCL.so  --download-viennacl=yes
+
+Create Tags
+===========
+	ctags -R --langmap=c++:+.tpp --langmap=c++:+.cu --langmap=c++:+.cl --language-force=c++ $PETSC_DIR
+
+Setup Jobs 
+===========
+        for idini in zz14s02?.ini zz14s04?.ini ; do python ireSolver.py --ini=$idini ; done
+	python ireSolver.py --ini=zz14s023.ini
+	python ireSolver.py --ini=zz14s024.ini
+	python ireSolver.py --ini=zz14s025.ini
+	python ireSolver.py --ini=zz14s026.ini
+	python ireSolver.py --ini=zz14s042.ini
+	python ireSolver.py --ini=zz14s043.ini
+	python ireSolver.py --ini=zz14s048.ini
+	python ireSolver.py --ini=zz14s049.ini
+
+Run Jobs 
+===========
+
+        for idmake in exec.zz14s02?.makefile; do make -j 5 -f $idmake ; done
+        for idmake in exec.zz14s04?.makefile; do make -j 4 -f $idmake ; done
+        
+        make -j 5 -f exec.zz14s023.makefile
+	make -j 5 -f exec.zz14s024.makefile
+	make -j 5 -f exec.zz14s025.makefile
+	make -j 5 -f exec.zz14s026.makefile
+	make -j 4 -f exec.zz14s042.makefile
+	make -j 4 -f exec.zz14s043.makefile
+	make -j 4 -f exec.zz14s048.makefile
+	make -j 4 -f exec.zz14s049.makefile
+
+
+Post Process Jobs 
+===========
+
+        for idmake in exec.zz14s0??.makefile; do make -f $idmake post ; done
+
+Performance 
+===========
+>> Possible perfomance bottleneck in PetscFEIntegrateResidual_OpenCL ? 
+>> Data Transfer each residual evaluation ? 
+$ git diff
+diff --git a/src/dm/dt/interface/dtfe.c b/src/dm/dt/interface/dtfe.c
+index ea994ff..56377d0 100644
+--- a/src/dm/dt/interface/dtfe.c
++++ b/src/dm/dt/interface/dtfe.c
+@@ -4455,7 +4455,7 @@ PetscErrorCode PetscFEIntegrateResidual_OpenCL(PetscFE fem, PetscDS prob, PetscI
+     }
+   }
+   ierr = PetscFEOpenCLGetIntegrationKernel(fem, useAux, &ocl_prog, &ocl_kernel);CHKERRQ(ierr);
+-  /* Create buffers on the device and send data over */
++  /* FIXME - Create buffers on the device and send data over */
+   ierr = PetscDataTypeGetSize(ocl->realType, &realSize);CHKERRQ(ierr);
+   if (sizeof(PetscReal) != realSize) {
+     switch (ocl->realType) {
+@@ -4543,7 +4543,7 @@ PetscErrorCode PetscFEIntegrateResidual_OpenCL(PetscFE fem, PetscDS prob, PetscI
+   ierr = clSetKernelArg(ocl_kernel, 4, sizeof(cl_mem), (void*) &o_jacobianDeterminants);CHKERRQ(ierr);
+   ierr = clSetKernelArg(ocl_kernel, 5, sizeof(cl_mem), (void*) &o_elemVec);CHKERRQ(ierr);
+   ierr = clEnqueueNDRangeKernel(ocl->queue_id, ocl_kernel, 3, NULL, global_work_size, local_work_size, 0, NULL, &ocl_ev);CHKERRQ(ierr);
+-  /* Read data back from device */
++  /* FIXME - Read data back from device */
+   if (sizeof(PetscReal) != realSize) {
+     switch (ocl->realType) {
+ 
+
+$ make tune
+$ grep "^OpenCL" log.block.*.batch.*.txt
+                               Event                Count      Time (sec)     Flops                             --- Global ---  --- Stage ---   Total
+                                                  Max Ratio  Max     Ratio   Max  Ratio  Mess   Avg len Reduct  %T %F %M %L %R  %T %F %M %L %R Mflop/s
+                               ------------------------------------------------------------------------------------------------------------------------
+log.block.0008.batch.0008.txt:OpenCL FEResidual       2 1.0 4.2912e-04 1.0 1.13e+08 1.0 0.0e+00 0.0e+00 0.0e+00  0 12  0  0  0   0 12  0  0  0 262326
+log.block.0008.batch.0016.txt:OpenCL FEResidual       2 1.0 4.7408e-04 1.0 1.13e+08 1.0 0.0e+00 0.0e+00 0.0e+00  0 12  0  0  0   0 12  0  0  0 237448
+log.block.0008.batch.0064.txt:OpenCL FEResidual       2 1.0 5.9094e-04 1.0 1.12e+08 1.0 0.0e+00 0.0e+00 0.0e+00  0 12  0  0  0   0 12  0  0  0 190125
+log.block.0008.batch.0128.txt:OpenCL FEResidual       2 1.0 1.0277e-03 1.0 1.12e+08 1.0 0.0e+00 0.0e+00 0.0e+00  0 12  0  0  0   0 12  0  0  0 109320
+log.block.0016.batch.0008.txt:OpenCL FEResidual       2 1.0 4.2915e-04 1.0 1.13e+08 1.0 0.0e+00 0.0e+00 0.0e+00  0 12  0  0  0   0 12  0  0  0 262306
+log.block.0016.batch.0016.txt:OpenCL FEResidual       2 1.0 4.7763e-04 1.0 1.12e+08 1.0 0.0e+00 0.0e+00 0.0e+00  0 12  0  0  0   0 12  0  0  0 235230
+log.block.0016.batch.0064.txt:OpenCL FEResidual       2 1.0 5.9856e-04 1.0 1.12e+08 1.0 0.0e+00 0.0e+00 0.0e+00  0 12  0  0  0   0 12  0  0  0 187706
+log.block.0016.batch.0128.txt:OpenCL FEResidual       2 1.0 1.0436e-03 1.0 1.11e+08 1.0 0.0e+00 0.0e+00 0.0e+00  0 12  0  0  0   0 12  0  0  0 106005
+log.block.0064.batch.0008.txt:OpenCL FEResidual       2 1.0 4.6592e-04 1.0 1.12e+08 1.0 0.0e+00 0.0e+00 0.0e+00  0 12  0  0  0   0 12  0  0  0 241143
+log.block.0064.batch.0016.txt:OpenCL FEResidual       2 1.0 5.3802e-04 1.0 1.12e+08 1.0 0.0e+00 0.0e+00 0.0e+00  0 12  0  0  0   0 12  0  0  0 208829
+log.block.0064.batch.0064.txt:OpenCL FEResidual       2 1.0 7.0563e-04 1.0 1.11e+08 1.0 0.0e+00 0.0e+00 0.0e+00  0 12  0  0  0   0 12  0  0  0 156774
+log.block.0064.batch.0128.txt:OpenCL FEResidual       2 1.0 1.1352e-03 1.0 1.11e+08 1.0 0.0e+00 0.0e+00 0.0e+00  0 12  0  0  0   0 12  0  0  0 97447
+log.block.0128.batch.0008.txt:OpenCL FEResidual       2 1.0 5.0656e-04 1.0 1.12e+08 1.0 0.0e+00 0.0e+00 0.0e+00  0 12  0  0  0   0 12  0  0  0 221797
+log.block.0128.batch.0016.txt:OpenCL FEResidual       2 1.0 5.8931e-04 1.0 1.11e+08 1.0 0.0e+00 0.0e+00 0.0e+00  0 12  0  0  0   0 12  0  0  0 187719
+log.block.0128.batch.0064.txt:OpenCL FEResidual       2 1.0 7.5037e-04 1.0 1.11e+08 1.0 0.0e+00 0.0e+00 0.0e+00  0 12  0  0  0   0 12  0  0  0 147427
+log.block.0128.batch.0128.txt:OpenCL FEResidual       2 1.0 1.4544e-03 1.0 1.11e+08 1.0 0.0e+00 0.0e+00 0.0e+00  0 12  0  0  0   0 12  0  0  0 76064
+log.block.dflt.batch.dflt.txt:OpenCL FEResidual       4 1.0 3.0366e-03 1.0 1.13e+08 1.0 0.0e+00 0.0e+00 0.0e+00  0 12  0  0  0   0 12  0  0  0 37090
+
+Usage
+===========
+  python ireSolver.py --ini=zz14s023.ini
+  ./ireSolver -run_type full -dim 3 -petscspace_order 1 -variable_coefficient field  -snes_type ksponly  -snes_monitor -snes_converged_reason -ksp_converged_reason -ksp_rtol 1.e-12 -pc_type bjacobi -info -info_exclude null,pc,vec,mat -vtk tissuetype/ZZ14S023.1.2.840.113619.2.55.1.1762880844.2178.1398254405.252_cleanup.vtk -f meshIREmidres.e -sourcelandmark sourcelandmarks.vtk -targetlandmark targetlandmarks.vtk -electric_conductivity 0.100000,0.100000,0.020000,2.000000,0.012000,0.230000,2.000000 -voltage 2700.000000 -solutionfile femsolution.2700.10.15.vtk  -petscfe_type opencl -mat_petscfe_type  opencl -petscfe_num_blocks 20 -mat_petscfe_num_blocks 20  -snes_mf
+  ./ireSolver -run_type full -dim 3 -petscspace_order 1 -variable_coefficient field  -snes_type ksponly  -snes_monitor -snes_converged_reason -ksp_converged_reason -ksp_rtol 1.e-12 -pc_type bjacobi -info -info_exclude null,pc,vec,mat -vtk tissuetype/ZZ14S023.1.2.840.113619.2.55.1.1762880844.2178.1398254405.252_cleanup.vtk -f meshIREmidres.e -sourcelandmark sourcelandmarks.vtk -targetlandmark targetlandmarks.vtk -electric_conductivity 0.100000,0.100000,0.020000,2.000000,0.012000,0.230000,2.000000 -voltage 2700.000000 -solutionfile femsolution.2700.10.15.vtk  -petscfe_type opencl -mat_petscfe_type  opencl -petscfe_num_batches 8 -mat_petscfe_num_batches 8 -petscfe_num_blocks 8 -mat_petscfe_num_blocks 8 -dm_vec_type  viennacl -dm_mat_type seqaijviennacl -mat_type seqaijviennacl
+.
+.
+.
+Writing Material...
+[0] DMGetDMSNES(): Creating new DMSNES
+[0] DMGetDMKSP(): Creating new DMKSP
+[0] PetscFEIntegrateResidual_OpenCL(): GPU layout grid(69,967,1) block(4,1,1) with 1 batches
+[0] PetscFEIntegrateResidual_OpenCL():  N_t: 4, N_cb: 1
+  0 SNES Function norm 3.551168480627e+01
+[0] SNESComputeJacobian(): Rebuilding preconditioner
+[0] KSPConvergedDefault(): Linear solver has converged. Residual norm 2.353365805890e-08 is less than relative tolerance 1.000000000000e-12 times initial right hand side norm 2.857042967252e+04 at iteration 144
+  Linear solve converged due to CONVERGED_RTOL iterations 144
+[0] SNESSolve_KSPONLY(): iter=0, linear solve iterations=144
+[0] PetscFEIntegrateResidual_OpenCL(): GPU layout grid(69,967,1) block(4,1,1) with 1 batches
+[0] PetscFEIntegrateResidual_OpenCL():  N_t: 4, N_cb: 1
+  1 SNES Function norm 8.915971910608e-05
+Nonlinear solve converged due to CONVERGED_ITS iterations 1
+Number of SNES iterations = 1
+L_2 Error: 5.50743
+
+ex12 
+====
+	./ex12 -run_type full -dim 3 -petscspace_order 1 -variable_coefficient field  -snes_type ksponly  -snes_monitor -snes_converged_reason -ksp_converged_reason -ksp_rtol 1.e-12 -pc_type bjacobi -info -info_exclude null,pc,vec,mat 
+
+Execute TCA solver with box mesh  from exodus
+=======
+	./tcaSolver -run_type test -dim 3 -variable_coefficient field    -interpolate 1 -petscspace_order 2 -show_initial -dm_plex_print_fem -f box.e
+	./tcaSolver -run_type full -dim 3 -variable_coefficient field    -interpolate 1 -petscspace_order 2 -dm_plex_print_fem -f box.e -snes_type ksponly  -snes_monitor -snes_converged_reason -ksp_converged_reason -ksp_rtol 1.e-12 -pc_type bjacobi
+
+Execute IRE solver with image data as material property and exodus mesh
+=======
+	python ireSolver.py --ini=zz14s023.ini
+	./ireSolver -run_type full -dim 3 -petscspace_order 1 -variable_coefficient field  -snes_type ksponly  -snes_monitor -snes_converged_reason -ksp_converged_reason -ksp_rtol 1.e-12 -pc_type bjacobi -info -info_exclude null,pc,vec,mat -vtk tissuetype/ZZ14S023.1.2.840.113619.2.55.1.1762880844.2178.1398254405.252_cleanup.vtk -f meshIRElores.e -sourcelandmark sourcelandmarks.vtk -targetlandmark targetlandmarks.vtk -electric_conductivity 0.100000,0.100000,0.020000,2.000000,0.012000,0.230000,2.000000 -voltage 2700.000000 -solutionfile femsolution.2700.10.15.vtk  
+	./ireSolver -run_type full -dim 3 -petscspace_order 1 -variable_coefficient field  -snes_type ksponly  -snes_monitor -snes_converged_reason -ksp_converged_reason -ksp_rtol 1.e-12 -pc_type bjacobi -info -info_exclude null,pc,vec,mat -vtk tissuetype/ZZ14S023.1.2.840.113619.2.55.1.1762880844.2178.1398254405.252_cleanup.vtk -f meshIREmidres.e -sourcelandmark sourcelandmarks.vtk -targetlandmark targetlandmarks.vtk -electric_conductivity 0.100000,0.100000,0.020000,2.000000,0.012000,0.230000,2.000000 -voltage 2700.000000 -solutionfile femsolution.2700.10.15.vtk  
+
+Execute rabbit parameter study 
+=======
+	python ireSolver.py --ini=rabbit14L071.ini
+
+OpenCL
+======
+	./ireSolver -run_type full -dim 3 -petscspace_order 1 -variable_coefficient field  -snes_type ksponly  -snes_monitor -snes_converged_reason -ksp_converged_reason -ksp_rtol 1.e-12 -pc_type bjacobi -info -info_exclude null,pc,vec,mat -vtk tissuetype/ZZ14S023.1.2.840.113619.2.55.1.1762880844.2178.1398254405.252_cleanup.vtk -f meshIRElores.e -sourcelandmark sourcelandmarks.vtk -targetlandmark targetlandmarks.vtk -electric_conductivity 0.100000,0.100000,0.020000,2.000000,0.012000,0.230000,2.000000 -voltage 2700.000000 -solutionfile femsolution.2700.10.15.vtk  -petscfe_type opencl -mat_petscfe_type  opencl 
+	./ireSolver -run_type full -dim 3 -petscspace_order 1 -variable_coefficient field  -snes_type ksponly  -snes_monitor -snes_converged_reason -ksp_converged_reason -ksp_rtol 1.e-12 -pc_type bjacobi -info -info_exclude null,pc,vec,mat -vtk tissuetype/ZZ14S023.1.2.840.113619.2.55.1.1762880844.2178.1398254405.252_cleanup.vtk -f meshIREmidres.e -sourcelandmark sourcelandmarks.vtk -targetlandmark targetlandmarks.vtk -electric_conductivity 0.100000,0.100000,0.020000,2.000000,0.012000,0.230000,2.000000 -voltage 2700.000000 -solutionfile femsolution.2700.10.15.vtk  -petscfe_type opencl -mat_petscfe_type  opencl 
+	./ireSolver -run_type full -dim 3 -petscspace_order 1 -variable_coefficient field  -snes_type ksponly  -snes_monitor -snes_converged_reason -ksp_converged_reason -ksp_rtol 1.e-12 -pc_type bjacobi -vtk geserviceStudy0025axt1.vtk -f meshIRElores.e -sourcelandmark sourcelandmarks.vtk -targetlandmark targetlandmarks.vtk -petscfe_type opencl -mat_petscfe_type  opencl -info -info_exclude null,vec,mat -petscfe_num_blocks 2 -petscfe_num_batches 2 -dm_plex_print_fem 2 -dm_plex_print_tol 1.0e-06
+
+constant coeff
+==============
+	./ireSolver -run_type full -dim 3 -petscspace_order 1 -variable_coefficient none  -snes_type ksponly  -snes_monitor -snes_converged_reason -ksp_converged_reason -ksp_rtol 1.e-12 -pc_type bjacobi -vtk geserviceStudy0025axt1.vtk -f meshIRElores.e -sourcelandmark sourcelandmarks.vtk -targetlandmark targetlandmarks.vtk -petscfe_type opencl -mat_petscfe_type  opencl -info -info_exclude null,vec,mat,pc -petscfe_num_blocks 2 -petscfe_num_batches 2 
+
+Debug 
+=====
+	gdb --args ./tcaSolver -run_type test -dim 3 -refinement_limit 0.0125 -variable_coefficient field    -interpolate 1 -petscspace_order 2 -show_initial -dm_plex_print_fem
+	gdb --args ./tcaSolver -run_type full -dim 3 -variable_coefficient field    -interpolate 1 -petscspace_order 2 -show_initial -dm_plex_print_fem -f box.e
+	gdb --args ./ireSolver -run_type full -dim 3 -refinement_limit 0.0125 -variable_coefficient field    -interpolate 1 -petscspace_order 2 -show_initial -dm_plex_print_fem -vtk geserviceStudy0025axt1mm.vtk
+
+	regular expression break point: rbreak ^f0
+
+Old GPU Assembly 
+================
+	$ make ex52_opencl
+	mpicxx -o ex52.o -c -O0 -g -O0   -fPIC    -I/opt/apps/PETSc/petsc-dev/include -I/opt/apps/PETSc/petsc-dev/arch-precise-gcc-4.6.3-dbg/include -I/usr/include -I/usr/lib/include -I/usr/include/mpich2   -I/usr/include/vtk-5.8 `pwd`/ex52.c
+	mpicxx -o ex52_integrateElementOpenCL.o -c -O0 -g -O0   -fPIC    -I/opt/apps/PETSc/petsc-dev/include -I/opt/apps/PETSc/petsc-dev/arch-precise-gcc-4.6.3-dbg/include -I/usr/include -I/usr/lib/include -I/usr/include/mpich2   -I/usr/include/vtk-5.8 `pwd`/ex52_integrateElementOpenCL.c
+	#/usr/bin/python /opt/apps/PETSc/petsc-dev/bin/pythonscripts/PetscGenerateFEMQuadrature.py 2 1 1 1 laplacian ex52.h
+	mpicxx -O0 -g -O0   -o ex52 ex52.o ex52_integrateElementOpenCL.o -Wl,-rpath,/opt/apps/PETSc/petsc-dev/arch-precise-gcc-4.6.3-dbg/lib -L/opt/apps/PETSc/petsc-dev/arch-precise-gcc-4.6.3-dbg/lib  -lpetsc -Wl,-rpath,/opt/apps/MKL/12.1/lib/intel64 -L/opt/apps/MKL/12.1/lib/intel64 -lmkl_intel_lp64 -lmkl_sequential -lmkl_core -lpthread -lm -Wl,-rpath,/opt/apps/PETSc/petsc-dev/arch-precise-gcc-4.6.3-dbg/lib -ltriangle -lX11 -Wl,-rpath,/usr/lib -L/usr/lib -lOpenCL -lctetgen -lpthread -Wl,-rpath,/usr/lib/x86_64-linux-gnu -L/usr/lib/x86_64-linux-gnu -lexoIIv2 -Wl,-rpath,/usr/lib/lib -L/usr/lib/lib -lnetcdf -lhdf5_fortran -lhdf5_hl -lhdf5 -lm -Wl,-rpath,/usr/lib/gcc/x86_64-linux-gnu/4.6 -L/usr/lib/gcc/x86_64-linux-gnu/4.6 -Wl,-rpath,/lib/x86_64-linux-gnu -L/lib/x86_64-linux-gnu -lmpichf90 -lgfortran -lm -lgfortran -lm -lquadmath -lm -lmpichcxx -lstdc++ -ldl -lmpich -lopa -lmpl -lrt -lcr -lpthread -lgcc_s -ldl
+	/bin/rm -f ex52.o ex52_integrateElement.o ex52_integrateElementOpenCL.omake ex52_opencl
+
+
+	./ex52 -gpu   -compute_function -show_residual
+	./ex52 -dim 3 -compute_function -show_residual -batch   -interpolate 1  -petscspace_order 2 -refinement_limit 0.0 -section_view -gpu
+
+Useful Commands 
+===============
+
+	cntl V -> arrows    : visual block
+	
+	yy  - copy
+	7yy - copy  7  lines:
+	9yy - copy  9  lines:
+	21yy- copy  21 lines:
+	
+	p   - paste
+	
+	search backward : 3
+	
+	
+	esc  exits writ mode
+	
+	:w  saves
+	
+	cntl w  - j/k  up/down
+
+
+
+### git commands 
+
+	save locally: git commit
+	
+	push to github: git push -u
+
+
+### screen 
+
+	esckey = cntl e
+	esckey S  : split screen
+	esckey |  : vertical split screen
+
