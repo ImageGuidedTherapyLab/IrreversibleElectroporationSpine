@@ -3,9 +3,9 @@ IRE Spine Project
 
 Code, notes, and writeup for Modeling of IRE prediction in swine spine
 
+ * publications are projects stored in a self contained git repo that contain code as well as write-up
  * proposals and pdf presentations stored as single git repo organized by funding source
- * publications are projects that contain code as well as write-up
- * submodules are used to point to publications within funding source
+   * submodules are used to point to publications within funding source
 
 Standard prefixes for commit messages
 -------------------------------------
