@@ -469,66 +469,374 @@ $k $ $ \frac{W}{ m \cdot K}$ & $\omega$ $\frac{kg}{m^3 s}$ &  $g$  &  $\mu_s$ $\
 \end{tabular}
 \end{table}
 
-%===================================================================
-\subsection{Error Metric and Thermal Image Noise}
-%===================================================================
 
-The temperature dependent relaxation properties of tissue are
-expected to adversely affect the MR temperature signal and cause
-artifacts.  Time varying and spatially dependent maps of the
-temperature image noise, $\sigma(x,t)$, are used to pointwise
-normalize unrealistic discrepancies between the measured
-temperature data, $u^{MRTI}$, and the model predicted temperature,
-$u$. The resulting metric of comparison, $\epsilon(t)$, is a
-weighted space $L_2$ norm within the time interval of interest,
-$[0,T]$, and normalized by the volume of the ROI, 
-$\Omega \subset \mathbb{R}^3$
-\begin{equation}\label{weightedL2Norm}
-\epsilon(t) = 
-\left( 
-\frac{ \|u - u^{MRTI}\|^2_\sigma }{ \int_\Omega \; dx }
-\right)^{1/2}
- = 
-\left( 
-  \frac{ 
-    \int_\Omega \left(
-                     \frac{u(x,t) - u^{MRTI}(x,t)}{\sigma(x,t)}
-               \right)^2 \; dx 
-       }{ \int_\Omega \; dx }
-\right)^{1/2}
-   \qquad t \in [0,T]
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsubsection{Theoretical Probability Density}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+The theoretical probability density, $\Theta$, represents the
+mathematical model predicted relationship between the parameter
+space, $\mathbb{M}$, and the data space, $\mathbb{D}$. 
+For a well defined mathematical model in which a unique solution
+exists, the theoretical probability density may be taken as a delta
+functional.
+This assumption explicitly ignores any potential modeling error
+and enforces the notion that the event of a temperature field not
+predicted by the theory has zero probability of occurring.
+The nonlinear mapping from parameter space to data space, 
+$u(\vec{m}) \in \mathbb{D}$, 
+is obtained as a solution to the Pennes bioheat
+transfer model~\cite{Pennes1948} coupled with the
+diffusion theory of light interaction with tissue~\cite{Welch95}. 
+\[ 
+ \rho  c_p \frac{\partial u}{\partial t}
+ -\nabla \cdot ( {k(\textbf{x})} \nabla u) 
+ + {\omega(\textbf{x})} c_{blood} (u - u_a )
+ = {\mu_a(\textbf{x})} \varphi(m,\textbf{x},t)  \quad \text{in } \Omega
+ \]
+\[
+   - {k(\textbf{x})} \nabla u \cdot \textbf{n} = 0
+        \qquad \text{on } \partial \Omega
+\qquad
+   u(\textbf{x},0) = u^0 \qquad \text{in } \Omega
+\]
+The initial temperature field, $u(\textbf{x},0)=u^0$, 
+is taken as the measured baseline body
+temperature.  The density of the continuum is denoted $\rho$, the
+specific heat of blood is denoted $c_{b} \left[\frac{J}{kg \cdot
+K}\right]$, $k(\textbf{x})$ denotes the thermal conductivity, and
+$\omega(\textbf{x})$ denotes perfusion.
+Zero heat flux Neumann data is assumed on the boundary, $\partial \Omega$.
+Although likely to result in optical parameter estimation 
+error due to the strong scattering assumptions~\cite{carp2004radiative},
+the classical
+spherically symmetric isotropic standard diffusion approximation (SDA)
+to the transport equation of
+light within a laser-irradiated tissue~\cite{Welch95} is used as the kernel
+in modeling the laser source term.  
+The SDA was used in this
+feasibility study for its computational simplicity in managing
+the algorithmic complexity of computing the gradient and Hessian of the misfit function, 
+Section~\ref{GradientHessianEvaluation}.
+The optical-thermal response to the laser source,
+$q_{laser} = {\mu_a(\textbf{x})} \varphi(m,\textbf{x},t)$,
+is modeled as 
+\[
+\begin{split}
+   \varphi(m,\textbf{x},t) & = 
+    \int_{U_{tip}}
+ \frac{P(t)  }{\text{Vol}(U_{tip}) }  
+   \frac{3\mu_{tr} \exp(-\mu_{eff} \| \textbf{x} -\mathbf{ \xi}\|) }
+      {4\pi \| \textbf{x}-\mathbf{ \xi}\|} \; d\mathbf{\xi}
+\quad
+\\
+ & \hspace{2in}   x \in U \backslash U_{tip}
+\\
+ & 
+  \mu_{tr}   = {\mu_a(\textbf{x}) } +  
+               {\mu_s(\textbf{x})} (1-g)
+\qquad
+  \mu_{eff}  = \sqrt{3 {\mu_a(\textbf{x})} \mu_{tr}}
+\end{split}
+\]
+$P(t) $ is the
+laser power as a function of time, $\mu_a$ and $\mu_s $ are laser
+coefficients related to laser wavelength and give probability of
+absorption and scattering of photons, respectively. The anisotropic
+factor is denoted $g$  
+and $\|x-\xi\|$ denotes the distance from the laser photon source, $U_{tip}$.
+Active cooling of the applicator is modeled by holding the temperature
+in this region fixed through Dirichlet boundary conditions at the ambient temperature
+\cite{fuentesetal11a}.
+
+Given an initial temperature field, $u^0$, a set of model parameters,
+$
+m \equiv ( k(\textbf{x}), \omega(\textbf{x}), 
+           \mu_a(\textbf{x}),\mu_s(\textbf{x})) \in \mathcal{M}
+$, and the appropriate boundary condition, a model prediction of
+the temperature field, $u(x,t)$, may be obtained.
+Discretizing the temperature with a Galerkin expansion at each 
+time step, the data space is represented by
+the vector space of Galerkin
+coefficients for the thermal field.
+Similarly, a Galerkin discretization is  used for the model
+parameters. The model space, $\mathbb{M}$, is the space of model
+parameters for which a unique solution is well defined.
+\[
+\begin{split}
+u(x,t^k) = \sum_j^{N_{dof}}  d_j^k  \phi_j(x) 
+\qquad 
+k = 1, 2, ..  N_{step}
+\qquad
+\qquad
+\mathbb{D} = \mathbb{R}^{N_{dof}*N_{step}}
+\\
+m(x) = \sum_j^{N_{model}}  m_j  \psi_j(x) 
+\qquad
+\qquad
+\mathbb{M} \subset \mathbb{R}^{N_{model}}
+\end{split}
+\]
+Here $N_{dof}$ and $N_{model}$ are the spatial temperature degrees of freedom and the parameter
+degrees of freedom, respectively. The number of time steps in the discretization is denoted $N_{step}$.
+In this application, an element of the data space, $\vec{d} \in
+\mathbb{D}$, is a set of Galerkin coefficients that may represent
+either an experimentally observed MRTI quantity or a quantity
+predicted by the bioheat transfer equation.  
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Discretization and Constitutive Data}~\label{DiscretizationConstitutive}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+The finite element model of the \textit{in vivo} TVT inoculated canine
+MRgLITT is shown in Figure~\ref{nanodog}. The insertion of the
+applicator into the tissue was modeled using a mesh that consisted of
+distinct regions for the applicator, healthy tissue, and cancer burden.
+A quadrilateral mesh was extruded axially along the applicator to create
+the base of the hexahedral finite element mesh. The mesh for the tissue
+conforms to the boundary of the application and extends to the boundary
+of the brain to ensure that the boundary does not influence the heating.
+The entire mesh consists of $N_{dof}=$47,941 total nodes (grid points).
+At each time step of the Crank-Nicolson scheme used, the temperature
+across the applicator was held constant to model the effect of the
+room-temperature cooling fluid which protects the laser fiber during
+heating. The degrees of freedom across the applicator were held at
+21$^o$C by treating the corresponding degrees of freedom as Dirichlet
+boundary data. The bioheat transfer model temperature prediction is not
+seen to be very sensitive to the optical scattering~\cite{Fengetal07}. 
+Only optical absorption and thermal conductivity
+parameter estimation is considered in this work.
+The combined thermal conductivity and optical
+absorption estimation consisted of $N_{model}=$4,570
+spatially varying parameters. 
+The remaining input parameters are assumed deterministic.
+ The laser power profile used
+during the therapy is shown in Figure~\ref{PowerProfile}. The test
+pulse, 3W for 30 seconds, and main therapeutic pulse, 3.5W for 3min, are
+shown. 
+%There are many combinations active power durations and magnitude,
+%including the data available, that may provide the significant heating
+%and fluence needed to recover the optical parameters and subsequently
+%predict the therapeutic heating accurately. 
+The amount, duration, and magnitude of heating data needed to accurately
+recover the optical parameters during the ``test" pulse of the
+experimental data and subsequent critical evaluation of accuracy of the
+calibrated computer model prediction during the therapeutic delivery is
+considered outside the scope of this work. The current work seeks to
+demonstrate the potential of parameter estimation, hence, parameter
+estimation for verifying uptake and potentially planning the procedure
+is considered for the time interval of the strongest fluence signal for
+the data acquired. Data acquired during the time window of the
+therapeutic heating and subsequent cooling, $\delta t = [204,504]$,
+$N_{step} = 300$ seen
+in Figure~\ref{PowerProfile}, is used to demonstrate the feasibility of
+recovering the 3D spatially varying optical distribution.  The
+Crank-Nicolson scheme was used to propagate the temperature field at one
+second time steps.  Table~\ref{modeldata} summarizes the constitutive
+data used.
+
+\begin{table}[h]
+\caption{Constitutive Data~\cite{Handbook05,Welch95,duck1990}}\label{modeldata}
+\centering 
+\begin{tabular}{|c|c|c|c|c|c|c|c|} \hline 
+$[k^{lb},k^{ub}]$ $ \frac{W}{ m \cdot K}$ & $\omega$ $\frac{kg}{m^3 s}$ &  $g$  &  $\mu_s$ $\frac{1}{m}$  &  $[\mu_a^{lb},\mu_a^{ub}]$  $\frac{1}{m}$   &  $\rho$ $\frac{kg}{m^3}$ &   $c_{blood}$ $ \frac{J}{kg \cdot K}$ &  $c_p$ $\frac{J}{kg \cdot K}$ \\ \hline
+          [0.1, 0.7]                    &             9.0             & 0.88  &       34.0e3              &     [60.0, 600.0]                             &  1045                        &            3840                      &                  3600          \\ \hline
+\end{tabular}
+\end{table}
+
+The field was optimized in a 1.5cm diameter spherical ROI about
+the laser applicator centroid.
+
+
+%========================================================================
+\subsection{Computational Methods}
+%========================================================================
+
+The three dimensional mathematical models for RF ablation are based on the
+Pennes bioheat transfer model~\cite{Pennes48} coupled with the quasistatic
+electrical conduction of RF waves as the primary mechanism of energy
+transfer~\cite{chang2004tml}. The quasistatic equation for the voltage, is
+obtained from the Maxwell equations with an irrotational electric field. The
+RF energy delivered over the time interval of the treatment, $[0,T]$,
+provides a resistive heating due to the current flow near the electrode of a
+480kHz monopolar RF generator.  The perfusion coefficient, thermal
+conductivity, and electrical conductivity, are assumed linear and spatially
+homogeneous model parameters.  The computational domain is taken large
+enough so that there may be assumed no heat flux across the surface.  The
+boundary is assumed an electrical ground for the voltage.  The computational
+models used provides a 4D prediction of both the temperature, $u(x,t)$, and
+the voltage, $\phi(x,t)$.  The set of governing partial differential
+equations that embody the computational models and as well as a summary of
+the model parameters used is provided in the appendix.
+
+The temperature of the blood warmed by a heat exchanger was used
+as the initial temperature field, $u(x,0)=u^0$=37$^o$C.
+Tissue damage is characterized by an Arrhenius model 
+of the spatially varying damage field $D(x)$ resulting from the
+time-temperature history during the RF ablation procedure.
+\[
+%\scalebox{1.0}{\includegraphics*{\picdir/arrheniusModel}}  
+D(\textbf{x})  = 
+    \int_0^T A \; e^{\frac{-E_a}{R \; u}} \; dt 
+\]
+The Arrhenius model is a classical and empirical law used to model
+kinetics of chemical reaction adopted to describe tissue
+damage~\cite{HM5,HM1,HM2}. Although there are more accurate damage models
+available~\cite{fengetal08}, Arrhenius model is
+commonly used due to its simplicity. In the Arrhenius model, the
+parameters $E_a$, $A$, and $R$ are constants determined usually by {\em
+in vitro} experiments, which represent activation energy, frequency
+factor, and the universal gas constant, respectively. 
+The values $A$ = 3.1e98$\frac{1}{s}$, $E_a$=6.28e5$\frac{J}{mol}$,
+and $R$=8.314$\frac{J}{kg \; mol}$ were used in this study.
+
+%========================================================================
+\paragraph{\textbf{{\large Appendix}}}
+%========================================================================
+
+The equations governing the resistive heating that provides the thermal
+source for the bioheat equation~\eqn{bioheatmodel} may be obtained from
+Maxwell's equation~\cite{demkowicz2006cha} using Faraday's
+law~\eqn{FaradayLaw}, Ampere's law~\eqn{AmpereLaw}, and the continuity
+of free charge~\eqn{ChargeContinuity}.
+\begin{equation} \label{FaradayLaw}
+%  \scalebox{1.0}{\includegraphics*{\picdir/FaradayLaw}}  
+ \nabla \times \vec{E} = -\frac{\partial}{\partial t} \vec{B}
 \end{equation}
-The SNR is assumed sufficiently large (SNR $>$ 10) such that the
-noise in the real and imaginary images may be approximated as
-Gaussian and the temperature image noise may be obtained from the
-measured SNR of the MR signal.
-\[
-\sigma(x,t) = \max_{\tau \in [0,t] \subseteq [0,T]}
-              \frac{ 1 } { 2 \pi \alpha \cdot \gamma B_0 \cdot \text{TE}}
-              \frac{ \sqrt{2} }{ \text{SNR}(x,\tau) }
+\begin{equation} \label{AmpereLaw}
+%  \scalebox{1.0}{\includegraphics*{\picdir/AmpereLaw}}  
+ \nabla \times \vec{B} = 
+        \mu \vec{J} + \mu \epsilon \frac{\partial}{\partial t} \vec{E}
+\end{equation}
+\begin{equation} \label{ChargeContinuity}
+%  \scalebox{1.0}{\includegraphics*{\picdir/ChargeContinuity}}  
+    \nabla \cdot \vec{J} + \frac{\partial}{\partial t} \rho_{charge} = 0 
+\end{equation}
+Here, the medium is assumed linear and isotropic with homogeneous
+permittivity, $\epsilon$, and permeability, $\mu$.
+The charge density is denoted $\rho_{charge}$.
+The electric and magnetic fields are denoted
+$\vec{E}$ and $\vec{B}$, respectively. 
+The current density, $J$, is assumed related to the electric field
+through Ohm's law, $\vec{J}=\sigma \vec{E}$, where $\sigma$ denotes
+the electrical conductivity.
+In the quasistatic case, the electric field is approximated as
+irrotational and Maxwell's system decouples
+\[ 
+%  \scalebox{1.0}{\includegraphics*{\picdir/irrotational}}  
+ \nabla \times \vec{E}   = 0 
+ \qquad \Rightarrow \qquad
+ \nabla \cdot \sigma \vec{E}   = 0 
 \]
-The current time maximum, $\max_{\tau \in [0,t]}$, is needed to
-normalize unrecoverable phase changes following T1 related signal
-loss due to large temperature changes.  The pointwise SNR was
-obtained as the ratio of corresponding magnitude image intensity
-$I(x,t)$ to the measured system noise, $\sigma_{system}$. 
+For an arbitrary control volume, the Poynting vector defines the amount
+of electromagnetic power, $Q_{em}$, which crosses the surface
 \[
-\sigma_{system} = \frac{<\delta I>_{ROI}}{0.655 \sqrt{2}}
+%  \scalebox{1.0}{\includegraphics*{\picdir/poyntingVector}}  
+ Q_{em} = \int_{\text{surface}} 
+                \left( \vec{E} \times \vec{B} \right) dA
 \]
-A difference method~\cite{Reeder07} was used to compute the system
-noise in the corresponding magnitude images.  The difference image
-standard deviation in the small volume of interest, $<\delta
-I>_{ROI}$, in air is measured in initial magnitude images.  A
-factor of $0.655$ is needed to approximate the low SNR Raleigh
-distributed signal in air as a Gaussian
-distribution~\cite{Haacke99}. The $\sqrt{2}$ arises from the
-difference method.
+From the conservation of energy for an arbitrary control volume, the
+mechanical energy and electromagnetic energy are coupled~\cite{pao1967fd}
+\[
+%  \scalebox{1.0}{\includegraphics*{\picdir/conserveNRG}}  
+ \rho  c_p \frac{\partial u}{\partial t} + 
+           \frac{\partial u_{em}}{\partial t} + 
+  -\nabla  \cdot k \nabla u + \omega c_{blood} (u - u_a )
+ = -Q_{em}(x,t) \\
+\]
+Here, the temperature is denoted $u$,
+$\rho$  is the density of the continuum, which is liver tissue in
+our case, and  $c_{blood}$ is the specific heat of blood. 
+The perfusion coefficient, $\omega$, and thermal conductivity, $k$,
+are assumed linear and
+spatially homogeneous model coefficients. 
+Combining the conservation of energy with Poynting's 
+theorem~\cite{jackson1999cer} yields
+\[
+%  \scalebox{1.0}{\includegraphics*{\picdir/pennesQuasi}}  
+ \rho  c_p \frac{\partial u}{\partial t} + 
+           \frac{\partial u_{em}}{\partial t} + 
+  -\nabla  \cdot k \nabla u + \omega c_{blood} (u - u_a )
+ = \vec{E} \cdot \vec{J} + \frac{\partial u_{em}}{\partial t} 
+\]
+%From Poynting's theorem, the energy density of the
+%electromagnetic field does not change
+%\[
+%\begin{split}
+% \frac{\partial u_{EM}}{\partial t}  
+%    & = 
+%        - \nabla \cdot \frac{1}{\mu}\left( \vec{E} \times \vec{B} \right) 
+%        - \vec{J} \cdot \vec{E}
+% \\
+%    &  = 
+%        - \frac{1}{\mu}\left( \vec{B} \cdot \nabla \times \vec{E} 
+%                            - \vec{E} \cdot \nabla \times \vec{B} \right) 
+%        - \vec{J} \cdot \vec{E}
+% \\
+%    &  = 
+%          \frac{1}{\mu} \vec{E} \cdot \left( \mu J \right) 
+%        - \vec{J} \cdot \vec{E}
+% \\
+%    &  =  0 
+%\end{split}
+%\]
+hence, the energy input into the tissue is
+dissipated through the resistive heating.
+\[
+%  \scalebox{1.0}{\includegraphics*{\picdir/resistiveHeat}}  
+Q_{RF}(x,t) = \vec{E} \cdot \vec{J} 
+            = \sigma \vec{E} \cdot \vec{E} 
+\]
+The relationship of the voltage, $\phi$, as the scalar potential for the
+electric field, $\nabla \phi = \vec{E}$, leads to the time dependent system
+of coupled equations governing the temperature and voltage.
+\begin{equation} \label{bioheatmodel}
+%\scalebox{1.0}{\includegraphics*{\picdir/bioheatmodel}}  
+\left.
+\begin{split}
+ \rho  c_p \frac{\partial u}{\partial t}
+ & -\nabla  \cdot k \nabla u + \omega c_{blood} (u - u_a )
+ = Q_{RF}(x,t) \\
+ & Q_{RF}(x,t) = \sigma |\nabla \phi|^2, \qquad 
+        \nabla \cdot \sigma \nabla \phi = 0
+\end{split}
+\right\}
+\end{equation}
+Dimensionally, the units of $Q_{RF}$ are consistent with power density.
+\[
+%  \scalebox{1.0}{\includegraphics*{\picdir/powerUnits}}  
+\frac{S}{m} \frac{V^2}{m^2} 
+  = \frac{\frac{A}{V}}{m} \frac{V^2}{m^2}  
+  = \frac{A V}{m^3} 
+  = \frac{ \frac{C}{s} \frac{J}{C} }{m^3} 
+  = \frac{W}{m^3} 
+\]
+Neumann and Dirichlet boundary conditions are used on the surface of
+the biological domain of interest, $\partial \Omega$, for the 
+the temperature and voltage, respectively. 
+\[
+%\scalebox{1.0}{\includegraphics*{\picdir/tempvoltbc}}  
+\left.
+\begin{split}
+ - k(u)      \nabla   u  \cdot \textbf{n}  & = 0 
+\\
+  \phi = 0
+\end{split} 
+\right\}
+\qquad \text{on } \partial \Omega
+\]
+A summary of the 
+constitutive data used is presented in Table~\ref{modeldata}.
 
-\begin{center}
- \textit{Possible location of Figure~\ref{data980CanineSummary}}
-\end{center}
-
-
+\begin{table}[h]
+\caption{Constitutive Data~\cite{Handbook05,stauffer2003paa,mcnichols2004mtb}}\label{modeldata}
+\centering
+\begin{tabular}{|c|c|c|c|c|c|c|c|c|} \hline
+$\sigma$  &  $k$   &  $\rho$                &  $u_a$       &
+$c_{blood}$                  &  $c_p$  & $A$ & $E_a$  & $R$  \\ \hline
+ 0.69 $\frac{S}{m}$  &  0.5  $\frac{W}{m K}$ &  1045 $\frac{kg}{m^3}$ &  308  $K$    &  3840 $ \frac{J}{kg \cdot K}$ &  3600 $ \frac{J}{kg \cdot K}$ 
+  &  3.1e98 $ \frac{1}{s}$ &  6.28e5 $ \frac{J}{mol}$ &8.314 $\frac{J}{kg \; mol}$ \\ \hline
+\end{tabular}
+\end{table}
 
 
 \paragraph{Acknowledgments}
