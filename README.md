@@ -4,8 +4,6 @@ IRE Spine Project
 Code, notes, and writeup for Modeling of IRE prediction in swine spine
 
  * publications are projects stored in a self contained git repo that contain code as well as write-up
- * proposals and pdf presentations stored as single git repo organized by funding source
-   * submodules are used to point to publications within funding source
 
 Standard prefixes for commit messages
 -------------------------------------
@@ -33,21 +31,25 @@ following - `http://www.itk.org/Wiki/ITK/Coding_Style_Guide#Naming_Conventions`
  * Use of abbreviations is discouraged. (Abbreviation are allowable when in common use, and should be in uppercase as in RGB.) While this does result in long names, it self-documents the code.
  * If you learn how to use name completion in your editor (e.g.,Vim, Emacs), this inconvenience can be minimized. 
 
-Submodules
-----------
+Submodule Organization
+----------------------
 
-http://git-scm.com/book/en/Git-Tools-Submodules
+http://git-scm.com/book/en/v2/Git-Tools-Submodules#Starting-with-Submodules
+
+ * proposals and pdf presentations stored as single git repo organized by funding source
+   * submodules are used to point to publications within funding source
+
+    git submodule add git@github.com:ImageGuidedTherapyLab/IrreversibleElectroporationSpine.git publications/IrreversibleElectroporationSpine
+    git commit -am 'DOC: ire paper'
+
+Submodule Usage
+---------------
+
+http://git-scm.com/book/en/v2/Git-Tools-Submodules#Cloning-a-Project-with-Submodules
+
 http://stackoverflow.com/questions/3796927/how-to-git-clone-including-submodules
 
     $ git submodule update --init --recursive
-    Submodule 'projects/CurveFit' (git@github.com:ImageGuidedTherapyLab/MatlabCurveFit.git) registered for path 'projects/CurveFit'
-    Cloning into 'projects/CurveFit'...
-    remote: Counting objects: 401, done.
-    remote: Total 401 (delta 0), reused 0 (delta 0)
-    Receiving objects: 100% (401/401), 1.67 MiB | 1.72 MiB/s, done.
-    Resolving deltas: 100% (178/178), done.
-    Submodule path 'projects/CurveFit': checked out '109825540c0790b3a949f77661a59410fbafb133'
-
 
 refresh all remotes' branches, adding new ones and deleting removed ones.
 ----------
