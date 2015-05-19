@@ -1,7 +1,7 @@
 IRE Spine Project
 ----------------------
 
-Code, notes, and writeup for Modeling of IRE prediction in swine spine
+Code, notes, and writeup 
 
  * publications are projects stored in a self contained git repo that contain code as well as write-up
 
