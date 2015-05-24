@@ -70,23 +70,58 @@ IRE Methods
 
 \maketitle
 
-\paragraph{Keywords} Bioheat Transfer $\cdot$ 
-                     %MR Thermal Imaging $\cdot$ 
-                     Laser Tissue Interaction $\cdot$ 
+\paragraph{Keywords} IRE $\cdot$ 
                      Finite Element Modeling
 
 {\color{red} what is the frequency in Hz of the applied IRE ? is the
 frequency the same a RF ? how would electrical properties differ at the two
 frequencies ? What frequency would B1 maps measure at ? }
 
-For each IRE vertebral ablation, the procedure was mathematically modeled as
-a quasi-static electric field induced by the voltage applied at the
-electrodes. A finite element method was used to numerically simulate the
-electric field within the tissue. The finite element mesh was discretized to
-conform to the geometry of the applicator. Heterogeneous electrical
-conductivity tissue properties were assumed for the cerebrospinal, spinal
-cord, skeletal muscle, bone, and fat. A finite mixture model was applied to
+
+Each IRE vertebral ablation 
+delivered by the Nanoknife generator system (Angiodynamics, Queensbury, NY)
+was mathematically modeled as
+a quasi-static electric field induced by the voltage applied at the electrodes.
+Similar to radiofrequency ablation~\cite{fuentesjvir},
+the quasistatic equation for the voltage is
+obtained from the Maxwell equations with an irrotational electric field. 
+Resistive heating is not considered. 
+The electrical conductivity is assumed piecewise constant across
+distinct tissue within the spinal anatomy (21);
+cerebrospinal fluid (CSF) 2.0 S/m; spinal cord 0.23
+S/m; skeletal muscle 0.1 S/m; bone 0.02 S/m; fat 0.012 S/m.
+A finite mixture model~\cite{avants2011} was applied to CT images to
 classify the tissue types. Nerve roots were manually located.
+
+
+A finite element method was used to numerically simulate the
+electric field within the tissue. The finite element mesh was discretized to
+conform to the geometry of the applicator.
+A single template FEM mesh was used to investigate each dataset.
+The applicator was located on the CT image of each dataset to register the computational
+domain to the imaging.
+To ensure convergence of the numerical method, the spatial mesh
+discretization was refined until there was less than a 0.5\% difference
+in solution between refinements.
+Boundary conditions at the 
+charged and grounded electrode surface were taken to
+be the applied voltage (2700, 1000, 833, 667, and 500 V) and zero, respectively.
+The domain used to solve for the models was large enough that electric
+insulation boundary conditions are appropriate. 
+The average
+and maximum electric field exposure of the spinal cord and exiting nerve
+root were calculated.  
+
+
+\section{notes}
+
+
+
+
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
 
 Numerical results also supported this decision. A field strength of xxx
 V/cm was observed in the nerve roots when 833 V/cm was applied at the
@@ -149,19 +184,7 @@ same electrode hooked up to angiodynamics system as well as rfa system for
 impedance measurement ? 
 electrode (Covidien, ACT2020, Single Electrode Kit, 20 cm - 2 cm )
 
-Pulses were applied at
-2700, 1000, 833, 667, and 500 V
-using 90 pulses, each 70 $\mu$s long, at a rate of 80 pulses per minute
-({\color{red}verify pulse per minute}).
 
-Nanoknife\textregistered generator system (Angiodynamics, Queensbury, NY).
-
-The boundaries
-of the charged and grounded electrode surface were taken to
-be $\phi=V0$ and $\phi=0$, respectively.
-
-The domain used to solve for the models was large enough that electric
-insulation boundary conditions are appropriate. 
 
 %FIXME: was it (call tech support)
 %     - 2 electrodes at the applied voltage 
@@ -172,9 +195,8 @@ insulation boundary conditions are appropriate.
 %===================================================================
 \section{Methods}
 %===================================================================
-
-
 {\color{red}
+
 Several of the thermal techniques
 use electrical pulses and the Joule heating effect to elevate the
 temperature of
@@ -191,9 +213,6 @@ liver
 cancer gives a thorough analysis of each (6).
 
 
-To ensure mesh quality and validity of solution,
-meshes were refined until there was less than a 0.5\% difference
-in solution between refinements
 
 
 The most commonly
@@ -233,68 +252,8 @@ The thermal effects are expected to be confined to a region near
 the applicator. Consequently, the boundary conditions of a
 conformal canine specific 3D volumetric hexahedral FEM mesh, shown
 in Figure~\ref{canineSetup} are expected to have no effect on the
-results.  Thus, a single template FEM mesh was used to investigate
-each canine data set. Magnitude images were used to manually
-register the mesh template to the thermal imaging data.  The
-objective of this study was to investigate modeling error in an ROI
-about the active tip of the applicator.  
+results.  
 
-% full mesh resolution
-%          elements    nodes
-%mesh[0]     20069     22148 
-%mesh[1]     27041     29568
-%mesh[2]     47785     51366
-%mesh[3]     52232     56565
-
-% summary of mesh resolution across ROI
-%                   meshlowerres    meshlores    meshnormres     mesh hires       original 
-%(element,nodes)      mesh[0]        mesh[1]        mesh[2]        mesh[3]        mesh[4]    
-%     ROI[1]      ( 2002, 2580)  ( 2678, 3388)  ( 8127, 9394)  ( 4200, 5200)  (10603,12324)
-%     ROI[2]      ( 1513, 2076)  ( 1975, 2677)  ( 6665, 7953)  ( 3341, 4227)  ( 8091, 9741)
-%     ROI[3]      ( 2393, 3029)  ( 3131, 3951)  ( 9013,10352)  ( 4896, 5974)  (11978,13874)
-%     ROI[4]      (  896, 1349)  ( 1225, 1806)  ( 4045, 5120)  ( 2629, 3481)  ( 5523, 6989)
-%
-%original ROI data for mesh[0]
-% ROI 1: # elements 10603  # nodes 12324  FOV 2.0cm x 2.1cm x 1.5cm
-% ROI 2: # elements 8091   # nodes 9741   FOV 1.6cm x 2.5cm x 1.3cm
-% ROI 3: # elements 11978  # nodes 13874  FOV 2.1cm x 2.6cm x 1.6cm
-% ROI 4: # elements 5523   # nodes 6989   FOV 2.1cm x 2.3cm x 0.8cm
-%elems = [10603,8091,11978,5523]  
-%nodes = [12324,9741,13874,6989]  
-%elems = [ 2002,2678,8127,4200,10603, 1513,1975,6665,3341, 8091, 2393,3131,9013,4896,11978, 896,1225,4045,2629, 5523 ]
-%nodes = [2580, 3388, 9394, 5200,12324, 2076, 2677, 7953, 4227, 9741 , 3029 , 3951,10352, 5974,13874 , 1349, 1806 , 5120, 3481, 6989]
-%
-%xroi  = [2.0  ,1.6 , 2.1 , 2.1]  
-%yroi  = [2.1  ,2.5 , 2.6 , 2.3]  
-%print mean(elems) , std (elems)
-%print mean(nodes) , std (nodes)
-%print mean(xroi ) , std (xroi )
-%print mean(yroi ) , std (yroi )
-%>>> print mean(elems) , std (elems)
-%9048.75 2467.00206475
-%>>> print mean(nodes) , std (nodes)
-%10732.0 2617.19114701
-%>>> print mean(xroi ) , std (xroi )
-%1.95 0.206155281281
-%>>> print mean(yroi ) , std (yroi )
-%2.375 0.192028643697
-
-
-%>>> from numpy import mean
-%>>> from numpy import std
-%>>> elems = [10603,8091,11978,5523]
-%>>> print mean(elems) , std (elems)
-%9048.75 2467.00206475
-%>>> elems = [ 2002,2678,8127,4200,10603, 1513,1975,6665,3341, 8091, 2393,3131,9013,4896,11978, 896,1225,4045,2629, 5523 ]
-%>>> print mean(elems) , std (elems)
-%4746.2 3196.00870775
-%>>> nodes = [2580, 3388, 9394, 5200,12324, 2076, 2677, 7953, 4227, 9741 , 3029 , 3951,10352, 5974,13874 , 1349, 1806 , 5120, 3481, 6989]
-%>>> print mean(nodes) , std (nodes)
-%5774.25 3593.95211258
-%>>> print min(nodes) , median (nodes) , max (nodes)
-%1349 4673.5 13874
-%>>> print min(elems) , median (elems) , max (elems)
-%896 3693.0 11978
 
 
 \textcolor{blue}{ % comments for review 1
@@ -312,271 +271,6 @@ Within the ROI, the mesh size element diameter ranged between
 [0.5mm,2mm]. As a reference, 1mm is on the order of the pixel size.
 }
 
-
-Geometric details of the applicator were closely modeled according
-to the manufacturer design and details provided in
-Figure~\ref{canineSetup}.  The active cooling of the applicator was
-\textcolor{blue}{ % comments for review 1
-modeled using Dirichlet boundary conditions to fix the temperature
-}
-along the axial length of the 1.5mm diameter catheter.  The
-temperature of the catheter was studied at both ambient room
-temperature, 21$^o$C, and body temperature 34.6$\pm$ 0.7 $^o$C.
-The 400 $\mu$m core diameter active region of the fiber-optic was
-modeled as $\Omega_{tip}$, a cylindrical 1.5mm diameter, 1cm axial
-region, at a distance of 5mm from the catheter tip. Modeling at the
-level of the 400 $\mu$m core diameter active tip is not expected to
-produce significant differences in the computations.  The finite
-element basis functions are continuous across the applicator tissue
-interface.  
-
-The optical photon source of the laser-tissue interaction was
-rigorously derived from a diffusion theory approximation to the
-light transport equation~\cite{Welch95}.  The resulting photon
-source is referred to as the conformal discretization approximation
-(CDA) in this manuscript.  The CDA model is similar to fully
-analytic attempts to capture the cylindrical geometry of the
-interstitial fiber-optic~\cite{Dickey04} but exploits the
-underlying finite element discretization of the computational
-domain to evenly distribute the laser power amongst the axial
-length and finite diameter in the active tip region.  An analogous
-discretization approach was implemented on structured
-grids~\cite{arnfield1989optical} and results in multiple individual
-optical diffusion approximation (ODA) along the centerline of the
-applicator.  The CDA accounts for the finite diameter of the
-applicator.  Within the diffusion theory assumptions, the resulting
-conformal discretization approximation is expected to provide a
-fluence source comparable to direct numerical solutions to the
-light transport equation~\cite{Mohammed05,shafirstein2004}.
-
-The diffusion model for light transport is built from the
-assumption that light is scattered more than absorbed, $ \mu_a <<
-\mu_s 
-% \Rightarrow \mu_{eff} << \mu_t
-$, where $\mu_a$ and $\mu_s $ give probability of absorption and
-scattering of photons, respectively.  An applied volumetric power
-density, $P^* \left[\frac{W}{m^3}\right]$, provides a photon flux
-throughout the active region of the interstitial laser fiber,
-$\Omega_{tip}$.  Huygens superposition principle~\cite{Dickey04} is
-used to treat each position in the domain, $\hat{x}\in
-\Omega_{tip}$, as an isotropic  differential point source of
-irradiance, $dE$,
-\[
-dE(x,\hat{x})= 
-             \frac{P^*(t)d\hat{x}}{4\pi 
-    \| x - \hat{ x}\|^2}
-             \exp\left(\mu_t
-                         \| x - \hat{ x }\|\right) 
-\qquad \qquad
-\hat{\textbf{s}} = 
-\frac{ x - \hat{ x }}{ \| x - \hat{ x}\| }
-\qquad \qquad
-x \in \Omega \backslash \Omega_{tip}
-\]
-The total attenuation is denoted $\mu_t  = {\mu_a} + {\mu_s}$.  The
-propagation direction, $\hat{\textbf{s}}$, is the unit vector from
-the primary source of unattenuated photons to the position $x$.
-The light transport is assumed quasi-static and a stationary
-diffusion model is used at each time point of interest to relate
-the scattered fluence, $z$, to the known irradiance, $dE$, emitted
-from point source $\hat{x} \in \Omega_{tip}$
-%
-% a unit vector along the line connecting the source (or element of the
-% source) to the point x"
-%
-% "E_0(x,s) is the irradiance at point x in the absence of tissue and s
-% indicates the direction of propagation of primary light. That is, s is
-% a unit vector along the line connecting the source (or element of the
-% source) to the point x"
-%
-% Use Welch...
-% The radiance of the primary light written in terms of its irradiance 
-% in equation (6.22). Substitutive this into eqn (6.16) leads to 
-% the transport equation written in terms of the scattering light
-% as the unknown variable with the unscattered light as the source,
-% eqn (6.26). IE eqn (6.16) and (6.26) are EQUIVALENT given eqn (6.16)
-% Under these assumptions 
-%
-% diffusion approximation introduced as a truncated series expansion of
-% the radiance of scattered light eqn (6.27) and is used in the
-% derivation of the flux conservation, eqn (6.32). The energy
-% conservation, eqn (6.29), is EXACT.
-%
-% F in eqn (6.29) is  the net energy flux of the SCATTERED LIGHT 
-% NOT THE SCATTERED PLUS IRRADIANT see eqn (6.28a) in Welch
-%
-% substituting  eqn (6.32b) into eqn (6.29) of welch book
-\begin{equation} \label{odaLTE}
-% \frac{1}{c(x)}
-% \frac{\partial(z+E)}{\partial t}
- -{\mu_a} z 
- +{\mu_s} \; dE(x,\hat{x})
- = \nabla \cdot 
-   \left( 
-   - \frac{ \nabla z }{3\mu_{tr}} 
-   + \frac{ {\mu_s} g }{3\mu_{tr}}
-      \; dE(x,\hat{x}) \; \hat{\textbf{s}}
-   \right)
-\quad
-  \mu_{tr}  = 
-                 {\mu_a} + 
-                    {\mu_s} (1-g)
-\quad
-x \in \Omega \backslash \Omega_{tip}
-\end{equation}
-The anisotropic factor is denoted $g$. 
-A conformal discretization approximation (CDA)
-of the integral of the differential irradiance over
-the domain of the active tip, $\Omega_{tip}$,
-is used to obtain an analytical expression
-for the scattered light, $z$
-\[
-\begin{split}
-E  & = \int_{\Omega_{tip}} dE(x,\hat{x}) d\hat{x}
-     = \int_{\Omega_{tip}} 
-             \frac{P^*(t)}{4\pi \| x - \hat{ x}\|^2}
-             \exp\left(\mu_t
-                         \| x - \hat{ x}\|\right) d\hat{x}
-\\
-  & \approx 
-  \sum_{e\in \Omega_{tip}} E_e(x,t)
-  =
-  \sum_{e\in \Omega_{tip}} 
-          \frac{\Delta V_e P^*(t)}{4\pi \| x - \hat{ x}_e\|^2}
-          \exp\left(\mu_t 
-                 \| x - \hat{ x}_e\|\right) 
-\end{split} 
-\]
-where $\Delta V_e$ is the volume and $\hat{ x}_e$ is the
-centroid of the elements within the FEM mesh of the active tip. 
-Here, conformal refers to a discretization such that the finite
-elements adhere to the boundary of the active tip, $\Omega_{tip}$.
-Similarly for the flux,
-%FIXME  FIXME  FIXME  FIXME  FIXME  FIXME  FIXME  FIXME  FIXME  FIXME
-%Should ${\mu_t}$ be the average over the path length???
-% this is already an approximation... if go through the trouble to 
-% take \mu_t as the average, what will be gained... ie don't worry about
-% it
-%FIXME  FIXME  FIXME  FIXME  FIXME  FIXME  FIXME  FIXME  FIXME  FIXME
-\[
-\begin{split}
-\int_{\Omega_{tip}} dE(x,\hat{x}) \; \hat{\textbf{s}} \; d\hat{x}
-   &   = \int_{\Omega_{tip}} 
-             \frac{P^*(t)}{4\pi \| x - \hat{ x}\|^2}
-             \exp\left(\mu_t 
-                         \| x - \hat{ x}\|\right) 
-\frac{ x - \hat{ x} }{ \| x - \hat{ x}\| }
-d\hat{x}
- \\
-  & \approx 
-    \sum_{e\in \Omega_{tip}} E_e(x,t) \hat{\textbf{s}}_e
-  = \sum_{e\in \Omega_{tip}} 
-          \frac{\Delta V_e P^*(t)}{4\pi \| x - \hat{ x}_e\|^2}
-          \exp\left(\mu_t 
-                         \| x - \hat{ x}_e\|\right) 
-\frac{ x - \hat{ x}_e }{ \| x - \hat{ x}_e\| }
-\end{split} 
-\]
-By linearity, each element in the discretization may be treated as
-an uncoupled and independent source in the light diffusion
-equation.
-\[
- -{\mu_a} z_e 
- +{\mu_s} E_e
- = \nabla \cdot 
-   \left( 
-   - \frac{ \nabla z_e }{3\mu_{tr}} 
-   + \frac{ {\mu_s} g }{3\mu_{tr}} 
-       E_e 
-      \frac{ x - \hat{ x}_e }{ \| x - \hat{ x}_e\| }
-   \right) \qquad \forall e \in \Omega_{tip}
-\]
-The total fluence resulting from each element source, $(\phi_t)_e =
-z_e + E_e$, may be obtained from the classical isotropic point
-source solution~\cite{Welch95} as  the sum of the light scattered
-from the element, $z_e$, and the element-wise primary source,
-$E_e$.  The total emanating fluence, $\phi_t(x,t)$, is the
-superposition of the element-wise solutions and reduces to a volume
-weighted sum over the elements.
-\begin{equation} \label{wfsLaserFluence}
-\begin{split}
-   \phi_t(x,t) & = \sum_{e \in \Omega_{tip}}
- {P^*(t)} \Delta  V_e  \left(
-   \frac{3\mu_{tr} \exp(-\mu_{eff} \| x -{ x_e}\|) }
-      {4\pi \| x-{ x_e}\|}
- - 
-      \frac{ 
-             \exp(-\mu_t \| x -{ x_e}\|) }
-           {2\pi \| x-{ x_e}\|^2}
-   \right)
-\\
-& \approx
-    \sum_{e \in \Omega_{tip}}
- {P^*(t)}  \Delta V_e 
-   \frac{3\mu_{tr} \exp(-\mu_{eff} \| x -{ x_e}\|) }
-      {4\pi \| x-{ x_e}\|}
-\qquad
- \mu_{eff}  = 
-           \sqrt{ 3 {\mu_a} \mu_{tr} }
-\\
-& 
-\hspace{3in}
- x \in \Omega \backslash \Omega_{tip}
-\end{split}
-\end{equation}
-
-A single point source ODA of the photon source at the centroid of
-the active tip, $ x_0$, is used as a control and comparison against
-previous work~\cite{fuentesetal09}.
-\begin{equation} \label{odaLaserFluence}
-   \phi_t(x,t)  = 
-   P(t) 
-   \frac{3\mu_{tr} \exp(-\mu_{eff} \| x -{ x_0}\|) }
-      {4\pi \| x-{ x_0}\|}
-\qquad  x \in \Omega \backslash \Omega_{tip}
-\end{equation}
-
-A linear Pennes model was used to simulate the bioheat
-transfer~\cite{Pennes48}.  The fluence, $\phi_t$, provides the
-thermal source in the bioheat equation and couples the diffusion
-theory model of light transport in tissue to Pennes model.  The
-laser powers and exposure times for each canine shown in
-Figure~\ref{data980CanineSummary} were modeled using piecewise
-continuous step functions of the wattage.  The model considers the
-optical and thermal properties of the tissue as well as a highly
-simplified model of the micro vasculature heat sink consisting of a
-linear temperature difference between the heated region and the
-arterial temperature, $u_a$. The Pennes bioheat equation has been
-shown to accurately model heating in areas absent of major
-vasculature~\cite{arkin1994}. 
-\[ \begin{split}
- \rho  c_p \frac{\partial u}{\partial t}
- -\nabla \cdot ( {k} \nabla u) 
- +{\omega} c_{blood} &(u - u_a )
- = {\mu_a} \phi_t  \qquad \text{in } \Omega
-\\
-   -  k  \nabla u \cdot \textbf{n} = 0
-           \qquad \text{on } \partial \Omega
-  &\qquad \qquad 
-   u  = u_{probe} \qquad \text{in } \Omega_{probe}
-\end{split} 
-\]
-The initial temperature field, $u( x,0)=u^0=$ 34.6$\pm$ 0.7 $^o$C,
-is taken as the measured baseline body temperature.  The density of
-the continuum is denoted $\rho$ and the specific heat of blood is
-denoted $c_{b} \left[\frac{J}{kg \cdot K}\right]$.  The boundary of
-the mesh template is far enough away from the heating region such
-that zero heat flux may be considered as the Neumann boundary
-condition on $\partial \Omega$.  The scalar-valued coefficient of
-thermal conductivity and perfusion are denoted $k$ and $\omega$.
-Within the region of the mesh that represents the applicator,
-$\Omega_{probe}$, a Dirichlet boundary condition is imposed such
-that the cooling water of the applicator is held at body
-temperature, $u_{probe}=u^0$, or ambient temperature,
-$u_{probe}=$21$^o$C, throughout the procedure.  The temperature
-evolution predicted by the bioheat equation was computed using the
-finite element method with linear polynomials and a Crank-Nicholson
-time stepping scheme.
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \subsubsection{Constitutive Data}
@@ -786,47 +480,6 @@ The field was optimized in a 1.5cm diameter spherical ROI about
 the laser applicator centroid.
 
 
-%========================================================================
-\subsection{Computational Methods}
-%========================================================================
-
-The three dimensional mathematical models for RF ablation are based on the
-Pennes bioheat transfer model~\cite{Pennes48} coupled with the quasistatic
-electrical conduction of RF waves as the primary mechanism of energy
-transfer~\cite{chang2004tml}. The quasistatic equation for the voltage, is
-obtained from the Maxwell equations with an irrotational electric field. The
-RF energy delivered over the time interval of the treatment, $[0,T]$,
-provides a resistive heating due to the current flow near the electrode of a
-480kHz monopolar RF generator.  The perfusion coefficient, thermal
-conductivity, and electrical conductivity, are assumed linear and spatially
-homogeneous model parameters.  The computational domain is taken large
-enough so that there may be assumed no heat flux across the surface.  The
-boundary is assumed an electrical ground for the voltage.  The computational
-models used provides a 4D prediction of both the temperature, $u(x,t)$, and
-the voltage, $\phi(x,t)$.  The set of governing partial differential
-equations that embody the computational models and as well as a summary of
-the model parameters used is provided in the appendix.
-
-The temperature of the blood warmed by a heat exchanger was used
-as the initial temperature field, $u(x,0)=u^0$=37$^o$C.
-Tissue damage is characterized by an Arrhenius model 
-of the spatially varying damage field $D(x)$ resulting from the
-time-temperature history during the RF ablation procedure.
-\[
-%\scalebox{1.0}{\includegraphics*{\picdir/arrheniusModel}}  
-D(\textbf{x})  = 
-    \int_0^T A \; e^{\frac{-E_a}{R \; u}} \; dt 
-\]
-The Arrhenius model is a classical and empirical law used to model
-kinetics of chemical reaction adopted to describe tissue
-damage~\cite{HM5,HM1,HM2}. Although there are more accurate damage models
-available~\cite{fengetal08}, Arrhenius model is
-commonly used due to its simplicity. In the Arrhenius model, the
-parameters $E_a$, $A$, and $R$ are constants determined usually by {\em
-in vitro} experiments, which represent activation energy, frequency
-factor, and the universal gas constant, respectively. 
-The values $A$ = 3.1e98$\frac{1}{s}$, $E_a$=6.28e5$\frac{J}{mol}$,
-and $R$=8.314$\frac{J}{kg \; mol}$ were used in this study.
 
 %========================================================================
 \paragraph{\textbf{{\large Appendix}}}
