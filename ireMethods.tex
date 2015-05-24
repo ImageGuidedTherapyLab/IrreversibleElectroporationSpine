@@ -75,9 +75,148 @@ IRE Methods
                      Laser Tissue Interaction $\cdot$ 
                      Finite Element Modeling
 
+{\color{red} what is the frequency in Hz of the applied IRE ? is the
+frequency the same a RF ? how would electrical properties differ at the two
+frequencies ? What frequency would B1 maps measure at ? }
+
+For each IRE vertebral ablation, the procedure was mathematically modeled as
+a quasi-static electric field induced by the voltage applied at the
+electrodes. A finite element method was used to numerically simulate the
+electric field within the tissue. The finite element mesh was discretized to
+conform to the geometry of the applicator. Heterogeneous electrical
+conductivity tissue properties were assumed for the cerebrospinal, spinal
+cord, skeletal muscle, bone, and fat. A finite mixture model was applied to
+classify the tissue types. Nerve roots were manually located.
+
+Numerical results also supported this decision. A field strength of xxx
+V/cm was observed in the nerve roots when 833 V/cm was applied at the
+electrodes. At 667 V/cm, the average field strength in the nerve roots
+predicted was xxx V/cm and below the known threshold for nerve damage. 
+
+
+Purpose
+
+To determine the energy threshold for spinal cord damage during irreversible
+electroporation (IRE) in the porcine spine.
+Materials and Methods
+
+Four terminal animals underwent computed tomography-guided IRE at five
+vertebral levels each, using different applied voltages (2700, 1000, 833,
+667, and 500 V). The electrode was placed through the lateral recess of the
+vertebral body. MRI imaging was performed 6-hrs after IRE. Histopathology of
+the spinal cord, nerve root, and ganglion was assessed using light
+microscopy. From the results of these animals, the electric field strength
+that demonstrated no imaging or histopathologic evidence of injury to the
+neural structures was selected for use in a survival study. Four pigs
+underwent IRE of 4 vertebral levels each using 667 V, were imaged with MRI,
+and survived for 7 days. Imaging and histopathologic data were analyzed. A
+finite element method was used to numerically simulate the electric field
+within the tissue. The finite element mesh was discretized to conform to the
+geometry of the IRE probe. Heterogeneous electrical conductivity tissue
+properties were assumed for the cerebrospinal, spinal cord, skeletal muscle,
+bone, and fat.
+Results
+
+The mean distance between the IRE probe and the spinal cord was 1.3 +/- 0.9
+mm. MRI and histopathology showed no evidence of spinal cord injury in the
+terminal animals irrespective of electric field strength applied.
+Histopathologic evaluation showed injury to one nerve root or ganglion when
+voltage applied was > 833 V. Thus, 667 V, which was also supported by the
+mathematical model, was used for the survival study. Average field strengths
+of 130 V/cm and 96 V/cm were observed in the nerve roots when 833 V and 667
+V were applied, respectively. In the survival animals, MRI showed no
+evidence of injury to the spinal cord and none were clinically symptomatic.
+Histopathology is pending.
+Conclusion
+
+While the spinal cord seems immune to the effects of IRE, injury to the
+nerve roots or ganglia may be the limiting factor for use in the vertebral
+body. Incorporating the use of mathematical models to set inverse treatment
+parameters may be helpful for treatment planning.
+
+
+
+semi-automatic methods were used for segmentation. 
+a mixture model was applied followed by  manual cleanup
+manually segment and
+extract key anatomic features (spinal
+cord, vertebra, paraspinal muscle
+
+
+
+ 
+same electrode hooked up to angiodynamics system as well as rfa system for
+impedance measurement ? 
+electrode (Covidien, ACT2020, Single Electrode Kit, 20 cm - 2 cm )
+
+Pulses were applied at
+2700, 1000, 833, 667, and 500 V
+using 90 pulses, each 70 $\mu$s long, at a rate of 80 pulses per minute
+({\color{red}verify pulse per minute}).
+
+Nanoknife\textregistered generator system (Angiodynamics, Queensbury, NY).
+
+The boundaries
+of the charged and grounded electrode surface were taken to
+be $\phi=V0$ and $\phi=0$, respectively.
+
+The domain used to solve for the models was large enough that electric
+insulation boundary conditions are appropriate. 
+
+%FIXME: was it (call tech support)
+%     - 2 electrodes at the applied voltage 
+%             - or -
+%     - 1 electrode at the voltage and one grounded with insulating BC
+
+
 %===================================================================
 \section{Methods}
 %===================================================================
+
+
+{\color{red}
+Several of the thermal techniques
+use electrical pulses and the Joule heating effect to elevate the
+temperature of
+the targeted tissue. For example, radiofrequency (RF) ablation requires an
+active electrode to be introduced into the undesirable tissue and an
+alternating
+current with high frequency of up to 500 kHz and high voltage, up to several
+(four) kV, to be used to heat the tissue to coagulation (3). ~\cite{Davalos2005}
+Traditional Joule heating
+employs electrodes inserted in tissue and DC or AC currents, e.g. (4).
+Microwave ablation uses electromagnetic fields in the MHz frequency domain
+(5) for thermal ablation. A recent review of these techniques applied to
+liver
+cancer gives a thorough analysis of each (6).
+
+
+To ensure mesh quality and validity of solution,
+meshes were refined until there was less than a 0.5\% difference
+in solution between refinements
+
+
+The most commonly
+used voltage parameters for ECT are eight 100-μs
+pulses at a 1-Hz frequency, and 1300 V is often applied
+across the two electrodes
+
+
+In this study~\cite{Miklavcic2000} correlating electroporation experiments with
+mathematical modeling, they found the electric field threshold
+for reversible electroporation is 362 ± 21 V cm−1 and
+the threshold for irreversible electroporation is 637 ± 43 V
+cm−1 for rat liver tissue using eight 100-μs pulses at a frequency
+of 1 Hz. Therefore, in our analysis, we have taken
+an electric field of 360 V cm−1 to represent the delineation
+between no electroporation and reversible electroporation,
+and 680 V cm−1 to represent the delineation between reversible
+and irreversible electroporation.
+
+}
+
+
+
 
 %The 32 slices that made up the 3D image were loaded into ITK-SNAP (Penn
 %Image Computing and Science Laboratory (PICSL), Dept. of Radiology,
