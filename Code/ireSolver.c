@@ -5,6 +5,19 @@
    
        Increase patchlevel to 3.5.2
 
+mpicxx -o ireSolver.o -c -g -O0   -fPIC    -I/opt/apps/PETSc/petsc-3.5.2/include -I/opt/apps/PETSc/petsc-3.5.2/arch-precise-gcc-4.6.3-dbg/include -I/usr/include -I/usr/lib/include -I/usr/include/mpich2   -I/usr/include/vtk-5.8 `pwd`/ireSolver.c
+In file included from /usr/include/c++/4.6/backward/strstream:52:0,
+                 from /usr/include/vtk-5.8/vtkIOStream.h:112,
+                 from /usr/include/vtk-5.8/vtkSystemIncludes.h:40,
+                 from /usr/include/vtk-5.8/vtkIndent.h:24,
+                 from /usr/include/vtk-5.8/vtkObjectBase.h:43,
+                 from /usr/include/vtk-5.8/vtkSmartPointerBase.h:26,
+                 from /usr/include/vtk-5.8/vtkSmartPointer.h:23,
+                 from /workarea/fuentes/github/IrreversibleElectroporationSpine/Code/ireSolver.c:20:
+/usr/include/c++/4.6/backward/backward_warning.h:33:2: warning: #warning This file includes at least one deprecated or antiquated header which may be removed without further notice at a future date. Please use a non-deprecated interface with equivalent functionality instead. For a listing of replacement headers and interfaces, consult the file backward_warning.h. To disable this warning use -Wno-deprecated. [-Wcpp]
+mpicxx -g -O0   -o ireSolver ireSolver.o -Wl,-rpath,/opt/apps/PETSc/petsc-3.5.2/arch-precise-gcc-4.6.3-dbg/lib -L/opt/apps/PETSc/petsc-3.5.2/arch-precise-gcc-4.6.3-dbg/lib  -lpetsc -Wl,-rpath,/opt/apps/MKL/12.1/lib/intel64 -L/opt/apps/MKL/12.1/lib/intel64 -lmkl_intel_lp64 -lmkl_sequential -lmkl_core -lpthread -lm -Wl,-rpath,/opt/apps/PETSc/petsc-3.5.2/arch-precise-gcc-4.6.3-dbg/lib -ltriangle -lX11 -Wl,-rpath,/usr/lib -L/usr/lib -lOpenCL -lctetgen -lpthread -lssl -lcrypto -Wl,-rpath,/usr/lib/x86_64-linux-gnu -L/usr/lib/x86_64-linux-gnu -lexoIIv2 -Wl,-rpath,/usr/lib/lib -L/usr/lib/lib -lnetcdf -lhdf5hl_fortran -lhdf5_fortran -lhdf5_hl -lhdf5 -lm -Wl,-rpath,/usr/lib/gcc/x86_64-linux-gnu/4.6 -L/usr/lib/gcc/x86_64-linux-gnu/4.6 -Wl,-rpath,/lib/x86_64-linux-gnu -L/lib/x86_64-linux-gnu -lmpichf90 -lgfortran -lm -lgfortran -lm -lquadmath -lm -lmpichcxx -lstdc++ -Wl,-rpath,/usr/lib/gcc/x86_64-linux-gnu/4.6 -L/usr/lib/gcc/x86_64-linux-gnu/4.6 -Wl,-rpath,/usr/lib/x86_64-linux-gnu -L/usr/lib/x86_64-linux-gnu -Wl,-rpath,/lib/x86_64-linux-gnu -L/lib/x86_64-linux-gnu -Wl,-rpath,/usr/lib/x86_64-linux-gnu -L/usr/lib/x86_64-linux-gnu -ldl -lmpich -lopa -lmpl -lrt -lcr -lpthread -lgcc_s -ldl   -rdynamic /usr/lib/libvtkVolumeRendering.so.5.8.0 /usr/lib/libvtkIO.so.5.8.0 /usr/lib/libvtkRendering.so.5.8.0 /usr/lib/libvtkIO.so.5.8.0 /usr/lib/libvtkGraphics.so.5.8.0 /usr/lib/libvtkImaging.so.5.8.0 /usr/lib/libvtkFiltering.so.5.8.0 /usr/lib/libvtkCommon.so.5.8.0 /usr/lib/libvtksys.so.5.8.0 /usr/lib/libvtkHybrid.so.5.8.0
+/bin/rm -f ireSolver.o
+
 */
 
 static char help[] = "Poisson Problem in 2d and 3d with simplicial finite elements.\n\
