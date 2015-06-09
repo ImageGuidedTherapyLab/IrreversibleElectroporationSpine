@@ -153,24 +153,25 @@ void nu_2d(const PetscReal x[], PetscScalar *u, void *ctx)
   double pcoord[3];
   int    index[3];
   //transform the point and return the intensity value
-  if ( user->ImageData->ComputeStructuredCoordinates(coord,index,pcoord) )
-   {
-     // get material property
-     PetscInt materialid = static_cast<PetscInt>( user->ImageData->GetScalarComponentAsDouble(index[0],index[1],index[2],0) );
-     // return electric conductivity value for this material
-     if (materialid < user->NmaxTissue)
-      {
-        *u = user->ElectricConductivity[materialid];
-      }
-     else
-      {
-        *u = user->ElectricConductivity[0];
-      }
-   }
-  else
-   {
-     *u = user->ElectricConductivity[0];
-   }
+  *u = user->ElectricConductivity[0];
+  //if ( user->ImageData->ComputeStructuredCoordinates(coord,index,pcoord) )
+  // {
+  //   // get material property
+  //   PetscInt materialid = static_cast<PetscInt>( user->ImageData->GetScalarComponentAsDouble(index[0],index[1],index[2],0) );
+  //   // return electric conductivity value for this material
+  //   if (materialid < user->NmaxTissue)
+  //    {
+  //      *u = user->ElectricConductivity[materialid];
+  //    }
+  //   else
+  //    {
+  //      *u = user->ElectricConductivity[0];
+  //    }
+  // }
+  //else
+  // {
+  //   *u = user->ElectricConductivity[0];
+  // }
    //if(  *u < 1.e-5) * u = 0.5;
 }
 
@@ -362,6 +363,8 @@ PetscErrorCode ProcessOptions(MPI_Comm comm, AppCtx *options)
   PetscBool targetflg;
   ierr = PetscOptionsString("-sourcelandmark", "vtk filename to read", "ex12.c", sourcelandmarkfile, sourcelandmarkfile, sizeof(sourcelandmarkfile), &sourceflg);CHKERRQ(ierr);
   ierr = PetscOptionsString("-targetlandmark", "vtk filename to read", "ex12.c", targetlandmarkfile, targetlandmarkfile, sizeof(targetlandmarkfile), &targetflg);CHKERRQ(ierr);
+  options->ApplicatorTransform = vtkSmartPointer<vtkLandmarkTransform>::New();
+  // transform to landmarks if available... otherwise should initialize to identity
   if (sourceflg && targetflg)
      {
        // read landmark files
@@ -373,17 +376,12 @@ PetscErrorCode ProcessOptions(MPI_Comm comm, AppCtx *options)
        TargetLMReader->Update();
 
        // initialize transform
-       options->ApplicatorTransform = vtkSmartPointer<vtkLandmarkTransform>::New();
        options->ApplicatorTransform->SetModeToRigidBody();
        options->ApplicatorTransform->SetSourceLandmarks( SourceLMReader->GetOutput()->GetPoints() );
        options->ApplicatorTransform->SetTargetLandmarks( TargetLMReader->GetOutput()->GetPoints() );
-       options->ApplicatorTransform->Update();
-       options->ApplicatorTransform->PrintSelf(std::cout,vtkIndent());
      }
-  else 
-     {
-       options->ApplicatorTransform = 0;
-     }
+  options->ApplicatorTransform->Update();
+  options->ApplicatorTransform->PrintSelf(std::cout,vtkIndent());
   // assign material properties 
 
   options->NmaxTissue = 7;
@@ -591,7 +589,8 @@ PetscErrorCode SetupDiscretization(DM dm, AppCtx *user)
   const PetscInt dim   = user->dim;
   const PetscInt id    = 1;
   const PetscInt nodeSetApplicatorValue = 2; // node set value assigned to exodus mesh
-  const PetscInt nodeSetBoundaryValue = 3; // node set value assigned to exodus mesh
+  const PetscInt nodeSetGroundValue = 3; // node set value assigned to exodus mesh
+  const PetscInt nodeSetNeumannBoundaryValue = 4; // node set value assigned to exodus mesh
   PetscFE        feAux = NULL;
   PetscFE        feBd  = NULL;
   PetscFE        feCh  = NULL;
@@ -663,11 +662,13 @@ PetscErrorCode SetupDiscretization(DM dm, AppCtx *user)
     }
     ierr = SetupProblem(cdm, user);CHKERRQ(ierr);
     PetscBool dirichletType =  (PetscBool)(user->bcType == DIRICHLET);
-    //ierr = DMPlexAddBoundary(cdm, bcCheck , "wall", user->bcType == NEUMANN ? "boundary" : "marker", 0, (void(*)())user->exactFuncs[0], 1, &id, user);CHKERRQ(ierr);
+    PetscBool neumannType   =  (PetscBool)(user->bcType == NEUMANN  );
+    //ierr = DMPlexAddBoundary(cdm, neumannType , "wall", user->bcType == NEUMANN ? "boundary" : "marker", 0, (void(*)())zero, 1, &nodeSetNeumannBoundaryValue, user);CHKERRQ(ierr);
     // TODO: for exodus mesh, the node set name is ignored and identified by integer nodeSetValue
     // TODO: function pointers specify the boundary value
-    ierr = DMPlexAddBoundary(cdm, dirichletType,  "applicator" , user->bcType == NEUMANN ? "boundary" : "Vertex Sets", 0, (void (*)())dirichletpotential, 1, &nodeSetApplicatorValue , user);CHKERRQ(ierr);
-    ierr = DMPlexAddBoundary(cdm, dirichletType,  "ground"     , user->bcType == NEUMANN ? "boundary" : "Vertex Sets", 0, (void (*)())zero, 1, &nodeSetBoundaryValue , user);CHKERRQ(ierr);
+    ierr = DMPlexAddBoundary(cdm, dirichletType,  "applicator" ,  "Vertex Sets", 0, (void (*)())dirichletpotential, 1, &nodeSetApplicatorValue , user);CHKERRQ(ierr);
+    ierr = DMPlexAddBoundary(cdm, dirichletType,  "ground"     ,  "Vertex Sets", 0, (void (*)())zero, 1, &nodeSetGroundValue , user);CHKERRQ(ierr);
+    ierr = DMPlexAddBoundary(cdm, dirichletType,  "neumann"    ,  "Vertex Sets", 0, (void (*)())zero, 1, &nodeSetNeumannBoundaryValue , user);CHKERRQ(ierr);
     ierr = DMPlexGetCoarseDM(cdm, &cdm);CHKERRQ(ierr);
   }
   ierr = PetscFEDestroy(&fe);CHKERRQ(ierr);

@@ -14,6 +14,10 @@ Create Tags
 ===========
 	ctags -R --langmap=c++:+.tpp --langmap=c++:+.cu --langmap=c++:+.cl --language-force=c++ $PETSC_DIR
 
+Check BC
+===========
+        ./ireSolver -run_type full -dim 3 -petscspace_order 1 -variable_coefficient field  -snes_type ksponly  -snes_monitor -snes_converged_reason -ksp_converged_reason -ksp_rtol 1.e-12 -pc_type bjacobi -info -info_exclude null,pc,vec,mat -vtk tissuetype/spinal14S023.vtk -f meshIREmidres.e  -electric_conductivity 0.100000,0.100000,0.020000,2.000000,0.012000,2.000000,0.230000 -voltage 500.000000 -solutionfile zz14s023/electric_conductivity.0500.25.30fem.vtk
+
 Setup Jobs 
 ===========
         for idini in zz14s02?.ini zz14s04?.ini ; do python ireSolver.py --ini=$idini ; done

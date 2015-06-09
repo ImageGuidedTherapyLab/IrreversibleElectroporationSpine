@@ -114,12 +114,17 @@ cubit.cmd('merge volume all')
 # mesh dependent node set
 cubit.cmd('skin volume all make group 7')
 cubit.cmd('group 7 name "appface"')
-cubit.cmd('nodeset 3 node in tri in group 7')
-cubit.cmd('nodeset 3 node in surface 60 100 129 158 172 143 114 80 90 149 178 120 remove')
-#cubit.cmd('nodeset 3 node in surface 90 149 178 120 remove')
+cubit.cmd('nodeset 4 node in tri in group 7')
+#cubit.cmd('nodeset 4 node in surface 60 100 129 158 172 143 114 80 90 149 178 120 remove')
+cubit.cmd('nodeset 4 node in surface 90 149 178 120 remove')
 ## specify active electrodes by location
-# FIXME cubit.cmd('nodeset 2 node with z_coord > 5  or z_coord < -5 in surface 90 149 178 120')
-cubit.cmd('nodeset 2 node in surface 90 149 178 120')
+## ground electrode
+cubit.cmd('nodeset 3 node with z_coord >  5 in surface 90 149 178 120')
+## active electrode
+cubit.cmd('nodeset 2 node with z_coord < -5 in surface 90 149 178 120')
+## rest of applicator is insulated
+cubit.cmd('nodeset 4 node with z_coord > -5 and z_coord <  5 in surface 90 149 178 120')
+#cubit.cmd('nodeset 2 node in surface 90 149 178 120')
 
 #cubit.cmd('nodeset 2 name "marker"') TODO: name note used in DMPlex
 ## # mesh independent node set
