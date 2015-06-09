@@ -56,6 +56,20 @@ refresh all remotes' branches, adding new ones and deleting removed ones.
 
     git remote update --prune
 
+
+work from branch 
+---------------
+
+    git checkout -b fuentesdt
+    git push origin fuentesdt
+
+merge branch 
+---------------
+
+   git checkout master
+   git merge --no-ff fuentesdt
+   git push origin master
+
 remove large file from history
 ----------
 https://help.github.com/articles/remove-sensitive-data/
