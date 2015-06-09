@@ -57,11 +57,22 @@ refresh all remotes' branches, adding new ones and deleting removed ones.
     git remote update --prune
 
 
-work from branch 
----------------
 
-    git checkout -b fuentesdt
-    git push origin fuentesdt
+initial fuentesdt branch
+----------
+
+git checkout -b fuentesdt
+
+
+work from remote fuentesdt branch
+----------
+
+git checkout -b fuentesdt origin/fuentesdt
+
+git branch --set-upstream origin/fuentesdt fuentesdt
+
+git push origin fuentesdt
+
 
 merge branch 
 ---------------
