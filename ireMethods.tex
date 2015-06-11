@@ -4,7 +4,7 @@
 %=================================================
 \usepackage{amssymb,amsfonts,amsmath}
 \usepackage{color,graphicx}
-\usepackage[left=1.0in,right=1.0in,top=1.0in,bottom=1.0in]{geometry}
+\usepackage[left=0.7in,right=0.7in,top=0.7in,bottom=0.7in]{geometry}
 \newcommand{\eqn}[1]{(\ref{#1})}
 %http://latex2rtf.sourceforge.net/latex2rtf_1_9_19.html#Conditional-Parsing
 %Starting with LaTeX2RTF 1.9.18, there is a handy method for
@@ -113,13 +113,109 @@ and maximum electric field exposure of the spinal cord and exiting nerve
 root were calculated.  
 
 
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\pagebreak
+\section{Electric conductivity $\sigma$ estimates}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+Faraday's law in integral form
+and Ampere's law in differential form may be combined to yeild an
+expression for the complex permittivity, $\kappa$~\cite{katscher2009determination}.
+\begin{equation}\label{FaradayAmpere}
+  \frac{\oint_{\partial A} \nabla \times \vec{H}  \cdot dl }{
+        \mu \omega^2  \int_A \vec{H} \cdot d\vec{a}
+       }
+   \approx
+     \kappa  = \epsilon  - i \; \sigma / \omega
+\qquad
+  \vec{H} = H_x \hat{x}   
+          + H_y \hat{y}   
+          + H_z \hat{z}   
+\end{equation}
+
+The magnetic field applied by the transmit coil is denoted $\vec{H}$,	
+$\omega$ is the Larmor frequency, and $\mu$ is the permeability.
+\begin{figure}[h]
+\centering\scalebox{0.2}{\includegraphics*{\picdir/ImagingPlane.png}}
+\caption{
+Coronal Imaging Plane~\cite{katscher2009determination}.
+}\label{Fig:ImagingPlane}
+\end{figure}
+A non-axial plane such as the 
+coronal plane, $y=$ constant, is perferred because the axial component,
+$H_z$ is not measurable. 
+For reference coronal imaging plane with respect to a 
+right hand coordinate system is shown in Figure~\ref{Fig:ImagingPlane},
+In this case \eqn{FaradayAmpere} may be reduced
+ to an expression for the conductivity, $\sigma$.
+\begin{equation}
+  \frac{\oint_{\partial A_{xz}}
+        \left\{
+          \partial_y \underbrace{H_z}_{= 0 \text{ by assumption}} - 
+          \partial_z             H_y
+              , 
+           \partial_x H_y - \partial_y H_x
+        \right\}  \cdot dl }{
+        \mu \omega^2  \int_{A_{xz} } H_y \cdot \; dx dz
+       }
+   \approx
+     \kappa  = \epsilon  - i \; \sigma / \omega
+\qquad
+\Rightarrow
+\qquad
+\sigma \approx
+  \frac{\oint_{\partial A_{xz}}
+           \partial_x H_y - \partial_y H_x
+                  \; ds  }{
+        \mu \omega  \int_{A_{xz} } H_y \cdot \; dx dz
+       }
+\end{equation}
+The integrals yeild a scalar valued average estimate of conduction, $\sigma \in
+\mathbb{R}$ with the ROI of interest, $A$.
+
+Paraphasing~\cite{katscher2009determination}: 
+"The use of a birdcage-type RF coil is advantageous,
+i.e., a quadrature body coil (QBC) or corresponding
+head coil. A birdcage coil allows choosing the coil polarization
+during transmission and reception. In particular,
+the structure of the birdcage
+coil imposes that transmit sensitivity,
+$H_+ = \frac{H_x + i H_y}{2}$, is substantially larger than receive sensitivity,
+$H_- = \frac{H_x - i H_y}{2}$.
+The determination of $H_+$, is the so-called B1 mapping. 
+A double angle method~\cite{insko1993mapping} is appropriate.
+However, these approaches only describe the determination of the modulus 
+$|H_+|$, from the signal ratio observed at the two flip angles $\theta_i$ .
+\begin{equation}
+ |H_+| = \frac{\cos^{-1}\left(\frac{1}{2\;r}\right)}{\omega t}
+  \qquad
+  r = \frac{1}{2 \; \cos \theta_1} = \frac{\sin \theta_1}{\sin \theta_2}
+  \qquad
+  \theta_2 = 2 \; \theta_1
+\end{equation}
+The use of a switched birdcage coil allows also the estimation of the B1
+phase."
+
+
+
+
+\begin{thebibliography}{10}
+\bibitem[11]{insko1993mapping}
+EK~Insko and L~Bolinger.
+\newblock Mapping of the radiofrequency field.
+\newblock {\em Journal of Magnetic Resonance, Series A}, 103(1):82--85, 1993.
+
+\bibitem[12]{katscher2009determination}
+Ulrich Katscher, Tobias Voigt, Christian Findeklee, Peter Vernickel, Kay
+  Nehrke, and O~Dossel.
+\newblock Determination of electric conductivity and local sar via b1 mapping.
+\newblock {\em Medical Imaging, IEEE Transactions on}, 28(9):1365--1374, 2009.
+
+\end{thebibliography}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\pagebreak
 \section{notes}
-
-
-
-
-
-
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 
@@ -648,8 +744,11 @@ Blender~\cite{roosendaal2000official} model repository.  Parameter
 studies were performed using allocations  at the Texas Advanced
 Computing Center. 
 
+%\bibliographystyle{plainnat}
+\bibliographystyle{plain}
+\bibliography{ireMethods}
+
 \end{document}
-% end of file template.tex
 
 
 
