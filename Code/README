@@ -49,7 +49,9 @@ Run Jobs
 Post Process Jobs 
 ===========
 
-        for idmake in exec.zz14s0??.makefile; do make -f $idmake post ; done
+        for idmake in exec.zz14s0??.makefile; do make -f $idmake post ; done > dataupdate.txt
+        grep "^[ ]*[234][0-9]" dataupdate.txt > corddata.txt
+        grep "^[ ]*1[0-9]"     dataupdate.txt > rootdata.txt
 
 Performance 
 ===========
