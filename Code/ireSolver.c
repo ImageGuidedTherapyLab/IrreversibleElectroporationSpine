@@ -681,7 +681,7 @@ PetscErrorCode SetupDiscretization(DM dm, AppCtx *user)
     // TODO: function pointers specify the boundary value
     ierr = DMPlexAddBoundary(cdm, dirichletType,  "applicator" ,  "Vertex Sets", 0, (void (*)())dirichletpotential, 1, &nodeSetApplicatorValue , user);CHKERRQ(ierr);
     ierr = DMPlexAddBoundary(cdm, dirichletType,  "ground"     ,  "Vertex Sets", 0, (void (*)())zero, 1, &nodeSetGroundValue , user);CHKERRQ(ierr);
-    ierr = DMPlexAddBoundary(cdm, dirichletType,  "neumann"    ,  "Vertex Sets", 0, (void (*)())zero, 1, &nodeSetNeumannBoundaryValue , user);CHKERRQ(ierr);
+    //ierr = DMPlexAddBoundary(cdm, dirichletType,  "neumann"    ,  "Vertex Sets", 0, (void (*)())zero, 1, &nodeSetNeumannBoundaryValue , user);CHKERRQ(ierr);
     ierr = DMPlexGetCoarseDM(cdm, &cdm);CHKERRQ(ierr);
   }
   ierr = PetscFEDestroy(&fe);CHKERRQ(ierr);
