@@ -69,6 +69,7 @@ typedef struct {
   void       (**exactFuncs)(const PetscReal x[], PetscScalar *u, void *ctx);
   vtkSmartPointer<vtkLandmarkTransform> ApplicatorTransform ; 
   vtkSmartPointer<vtkImageData> ImageData ; 
+  double bounds[6];
 } AppCtx;
 
 void zero(const PetscReal coords[], PetscScalar *u, void *ctx)
@@ -163,28 +164,37 @@ void nu_2d(const PetscReal x[], PetscScalar *u, void *ctx)
   AppCtx *user= (AppCtx*) ctx;
 
   double coord[3]= {x[0],x[1],x[2]};
+  // project to boundary
+  if(coord[2] > user->bounds[5] )
+    {
+     coord[2] =  user->bounds[5] ;
+    }
+  else if(coord[2] < user->bounds[4] )
+    {
+     coord[2] =  user->bounds[4] ;
+    }
   double pcoord[3];
   int    index[3];
   //transform the point and return the intensity value
   *u = user->ElectricConductivity[0];
-  //if ( user->ImageData->ComputeStructuredCoordinates(coord,index,pcoord) )
-  // {
-  //   // get material property
-  //   PetscInt materialid = static_cast<PetscInt>( user->ImageData->GetScalarComponentAsDouble(index[0],index[1],index[2],0) );
-  //   // return electric conductivity value for this material
-  //   if (materialid < user->NmaxTissue)
-  //    {
-  //      *u = user->ElectricConductivity[materialid];
-  //    }
-  //   else
-  //    {
-  //      *u = user->ElectricConductivity[0];
-  //    }
-  // }
-  //else
-  // {
-  //   *u = user->ElectricConductivity[0];
-  // }
+  if ( user->ImageData->ComputeStructuredCoordinates(coord,index,pcoord) )
+   {
+     // get material property
+     PetscInt materialid = static_cast<PetscInt>( user->ImageData->GetScalarComponentAsDouble(index[0],index[1],index[2],0) );
+     // return electric conductivity value for this material
+     if (materialid < user->NmaxTissue)
+      {
+        *u = user->ElectricConductivity[materialid];
+      }
+     else
+      {
+        *u = user->ElectricConductivity[0];
+      }
+   }
+  else
+   {
+     *u = user->ElectricConductivity[0];
+   }
    //if(  *u < 1.e-5) * u = 0.5;
 }
 
@@ -365,6 +375,10 @@ PetscErrorCode ProcessOptions(MPI_Comm comm, AppCtx *options)
        reader->Update();
        // initilize the bounding data structure
        options->ImageData = vtkImageData::SafeDownCast( reader->GetOutput()) ;
+       options->ImageData->PrintSelf(std::cout,vtkIndent());
+       options->ImageData->GetBounds(options->bounds);
+       ierr = PetscPrintf(PETSC_COMM_WORLD, "ZBounds [%f,%f] \n",
+                            options->bounds[4],options->bounds[5]);
      }
   else 
      {

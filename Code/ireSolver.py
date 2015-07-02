@@ -126,7 +126,8 @@ if (options.config_ini != None):
   rawheaderinfo = headerProcess.stdout.readline().strip('\n')
   # rawheaderinfo = 'Image #1: dim = [512, 512, 184];  bb = {[124 124 -85], [372 372 835]};  vox = [0.484375, 0.484375, 5];  range = [0, 14];  orient = LPI'
   conversionfactor = .001
-  spacing = [conversionfactor *dxvox for  dxvox in eval(rawheaderinfo.split(";")[2].split("=")[1]) ]
+  spacing   = [conversionfactor *dxvox  for  dxvox in eval(rawheaderinfo.split(";")[2].split("=")[1]) ]
+  dimension = [              int(dxvox) for  dxvox in eval(rawheaderinfo.split(";")[0].split("=")[1]) ]
 
   # convert to meters
   convertMeterCmd = 'c3d %s -replace %s -origin 0.0x0.0x0.0mm -spacing %fx%fx%fmm -o %s' % (niftiimage,tissuereplace , spacing[0],spacing[1],spacing[2], vtkimage   )
@@ -172,15 +173,40 @@ if (options.config_ini != None):
       applicatorEntryInfo = applicatorEntryInfoProcess.stdout.readlines()
       print applicatorEntryInfo
 
+      nerveRootInfoCMD = 'c3d %s -threshold %d %d 1 0 -centroid ' % (vtknerverootimage  , applicatorid['root'],applicatorid['root'])
+      print nerveRootInfoCMD 
+      nerveRootInfoProcess = subprocess.Popen(nerveRootInfoCMD,shell=True,stdout=subprocess.PIPE )
+      while ( nerveRootInfoProcess.poll() == None ):
+         pass
+      nerveRootInfo = nerveRootInfoProcess.stdout.readlines()
+      print nerveRootInfo
+
+      spinalCordInfoCMD = 'c3d %s -threshold %d %d 1 0 -centroid ' % (vtknerverootimage  , applicatorid['cord'],applicatorid['cord'])
+      print spinalCordInfoCMD 
+      spinalCordInfoProcess = subprocess.Popen(spinalCordInfoCMD,shell=True,stdout=subprocess.PIPE )
+      while ( spinalCordInfoProcess.poll() == None ):
+         pass
+      spinalCordInfo = spinalCordInfoProcess.stdout.readlines()
+      print spinalCordInfo
+
       # build fem command
       dmplexCmd = './ireSolver -run_type full -dim 3 -petscspace_order 1 -variable_coefficient field  -snes_type ksponly  -snes_monitor -snes_converged_reason -ksp_converged_reason -ksp_rtol 1.e-12 -pc_type bjacobi -info -info_exclude null,pc,vec,mat '
       #dmplexCmd = './tcaPointSource -run_type full -dim 3 -petscspace_order 1 -variable_coefficient field  -snes_type ksponly  -snes_monitor -snes_converged_reason -ksp_converged_reason -ksp_rtol 1.e-12 -pc_type bjacobi -info -info_exclude null,vec,mat '
-      dmplexCmd += '-vtk %s ' % vtkimage  
       dmplexCmd += '-f %s '   % config.get('setup','meshfile') 
       #tippoint   = eval(config.get('registration','tippoint'   ))
       #entrypoint = eval(config.get('registration','entrypoint' ))
-      tippoint   = [idvox*dxvox for  idvox,dxvox in zip(eval(applicatorTipInfo[0].strip(  '\n').strip('CENTROID_VOX ')    ) ,spacing)]
-      entrypoint = [idvox*dxvox for  idvox,dxvox in zip(eval(applicatorEntryInfo[0].strip('\n').strip('CENTROID_VOX ')    ) ,spacing)]
+      tippoint      = [idvox*dxvox for  idvox,dxvox in zip(eval(applicatorTipInfo[0].strip(  '\n').strip('CENTROID_VOX ')    ) ,spacing)]
+      entrypoint    = [idvox*dxvox for  idvox,dxvox in zip(eval(applicatorEntryInfo[0].strip('\n').strip('CENTROID_VOX ')    ) ,spacing)]
+      tippointvox   = eval(applicatorTipInfo[0].strip(  '\n').strip('CENTROID_VOX ') )   
+      entrypointvox = eval(applicatorEntryInfo[0].strip('\n').strip('CENTROID_VOX ') )   
+      nerverootvox  = eval(nerveRootInfo[0].strip(      '\n').strip('CENTROID_VOX ') )   
+      spinalcordvox = eval(spinalCordInfo[0].strip(     '\n').strip('CENTROID_VOX ') )   
+      axialbounds   = [ int(min(tippointvox[2],entrypointvox[2],nerverootvox[2],spinalcordvox[2])), int(max(tippointvox[2],entrypointvox[2],nerverootvox[2],spinalcordvox[2]))+1]
+      roiimage            = niftiimage.replace('.nii.gz',outputid+'.vtk')
+      extractROICmd = 'c3d %s -region 0x0x%dvox %dx%dx%dvox -o %s' % (vtkimage, axialbounds[0], dimension[0],dimension[1],axialbounds[1],roiimage )
+      print extractROICmd 
+      os.system(extractROICmd )
+      dmplexCmd += '-vtk %s ' % roiimage            
                   
       SourceLandmarkFileName = "%s/sourcelandmarks.%s.vtk" % (jobid,outputid)
       TargetLandmarkFileName = "%s/targetlandmarks.%s.vtk" % (jobid,outputid)
