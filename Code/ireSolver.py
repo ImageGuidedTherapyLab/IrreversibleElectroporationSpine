@@ -203,9 +203,12 @@ if (options.config_ini != None):
       spinalcordvox = eval(spinalCordInfo[0].strip(     '\n').strip('CENTROID_VOX ') )   
       axialbounds   = [ int(min(tippointvox[2],entrypointvox[2],nerverootvox[2],spinalcordvox[2])), int(max(tippointvox[2],entrypointvox[2],nerverootvox[2],spinalcordvox[2]))+1]
       roiimage            = niftiimage.replace('.nii.gz',outputid+'.vtk')
-      extractROICmd = 'c3d %s -region 0x0x%dvox %dx%dx%dvox -o %s' % (vtkimage, axialbounds[0], dimension[0],dimension[1],axialbounds[1],roiimage )
+      extractROICmd = 'c3d %s -region 0x0x%dvox %dx%dx%dvox -o %s' % (vtkimage, axialbounds[0], dimension[0],dimension[1],axialbounds[1]-axialbounds[0],roiimage )
       print extractROICmd 
       os.system(extractROICmd )
+      if(axialbounds[1] - axialbounds[0] > 10   ):
+         print voltage,applicatorid 
+         raise RuntimeError("too large domain")
       dmplexCmd += '-vtk %s ' % roiimage            
                   
       SourceLandmarkFileName = "%s/sourcelandmarks.%s.vtk" % (jobid,outputid)
