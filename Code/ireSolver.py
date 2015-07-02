@@ -203,7 +203,7 @@ if (options.config_ini != None):
       spinalcordvox = eval(spinalCordInfo[0].strip(     '\n').strip('CENTROID_VOX ') )   
       axialbounds   = [ int(min(tippointvox[2],entrypointvox[2],nerverootvox[2],spinalcordvox[2])), int(max(tippointvox[2],entrypointvox[2],nerverootvox[2],spinalcordvox[2]))+1]
       roiimage            = niftiimage.replace('.nii.gz',outputid+'.vtk')
-      extractROICmd = 'c3d %s -region 0x0x%dvox %dx%dx%dvox -o %s' % (vtkimage, axialbounds[0], dimension[0],dimension[1],axialbounds[1]-axialbounds[0],roiimage )
+      extractROICmd = 'c3d %s -region 0x0x%dvox %dx%dx%dvox -replace 3 1 -o %s' % (vtkimage, axialbounds[0], dimension[0],dimension[1],axialbounds[1]-axialbounds[0],roiimage )
       print extractROICmd 
       os.system(extractROICmd )
       if(axialbounds[1] - axialbounds[0] > 10   ):
@@ -223,8 +223,7 @@ if (options.config_ini != None):
       dmplexCmd += '-electric_conductivity %f,%f,%f,%f,%f,%f,%f ' %  ( tissueDictionary[typeDictionary[0]],tissueDictionary[typeDictionary[1]],tissueDictionary[typeDictionary[2]], tissueDictionary[typeDictionary[3]],  tissueDictionary[typeDictionary[4]], tissueDictionary[typeDictionary[5]], tissueDictionary[typeDictionary[6]])
       #dmplexCmd += '-forcingconstant %f ' % config.getfloat('setup','forcingconstant')
       dmplexCmd += '-voltage %f ' % voltage
-      femoutputfile = "%s/%sfem.vtk" %  (jobid, outputid )
-      dmplexCmd += '-solutionfile %s ' % femoutputfile 
+      dmplexCmd += '-dataid %s/%s ' % (jobid, outputid )
 
       # create applicator model
       transform  = GetApplicatorTransform(tippoint   ,entrypoint,SourceLandmarkFileName, TargetLandmarkFileName )

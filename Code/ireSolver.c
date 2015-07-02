@@ -55,6 +55,7 @@ typedef struct {
   PetscInt      dim;               /* The topological mesh dimension */
   char          filename[2048];    /* The optional ExodusII file */
   char          imagefile[2048];   /* The vtk Image file */
+  char          dataid[2048];      /* tag data output */
   PetscBool     interpolate;       /* Generate intermediate mesh elements */
   PetscReal     refinementLimit;   /* The largest allowable cell volume */
   PetscBool     refinementUniform; /* Uniformly refine the mesh */
@@ -367,6 +368,7 @@ PetscErrorCode ProcessOptions(MPI_Comm comm, AppCtx *options)
   ierr = PetscOptionsBool("-restart", "Read in the mesh and solution from a file", "ex12.c", options->restart, &options->restart, NULL);CHKERRQ(ierr);
   ierr = PetscOptionsBool("-check", "Compare with default integration routines", "ex12.c", options->check, &options->check, NULL);CHKERRQ(ierr);
   ierr = PetscOptionsString("-vtk", "vtk filename to read", "ex12.c", options->imagefile, options->imagefile, sizeof(options->imagefile), &flg);CHKERRQ(ierr);
+  ierr = PetscOptionsString("-dataid", "output data id ", "ex12.c", options->dataid, options->dataid, sizeof(options->dataid), &flg);CHKERRQ(ierr);
   if (flg)
      {
        ierr = PetscPrintf(PETSC_COMM_WORLD, "opening file...\n");CHKERRQ(ierr);
@@ -664,7 +666,8 @@ PetscErrorCode SetupDiscretization(DM dm, AppCtx *user)
       //Vec          globalnu; // global vector
       //ierr = DMCreateGlobalVector(dmAux, &globalnu);CHKERRQ(ierr);
       ierr = PetscObjectQuery((PetscObject) dm, "A", (PetscObject *) &localnu);CHKERRQ(ierr);
-      char               vtkfilename[PETSC_MAX_PATH_LEN] = "material.vtk";
+      char               vtkfilename[PETSC_MAX_PATH_LEN];
+      sprintf(vtkfilename,"%smaterial.vtk",user->dataid);
       // scatter material to u
       //ierr = DMLocalToGlobalBegin(dm, localnu, INSERT_VALUES, globalnu);CHKERRQ(ierr);
       //ierr = DMLocalToGlobalEnd(dm, localnu, INSERT_VALUES, globalnu);CHKERRQ(ierr);
@@ -801,7 +804,8 @@ int main(int argc, char **argv)
     }
     if (write_output) {
       PetscViewer viewer;
-      char               vtkfilename[PETSC_MAX_PATH_LEN] = "solution.0000.vtk";
+      char               vtkfilename[PETSC_MAX_PATH_LEN];
+      sprintf(vtkfilename,"%ssolution.0000.vtk",user.dataid);
       ierr = PetscViewerVTKOpen(PETSC_COMM_WORLD,vtkfilename,FILE_MODE_WRITE,&viewer);CHKERRQ(ierr);
       ierr = VecView(u,viewer);CHKERRQ(ierr);
       ierr = PetscViewerDestroy(&viewer);CHKERRQ(ierr);
@@ -864,9 +868,8 @@ int main(int argc, char **argv)
 
   if (write_output) {
     PetscViewer viewer;
-    PetscBool   vtkflg;
-    char               vtkfilename[PETSC_MAX_PATH_LEN] = "solution.0001.vtk";
-    ierr = PetscOptionsString("-solutionfile", "vtk filename to write", "ex12.c", vtkfilename, vtkfilename, sizeof(vtkfilename), &vtkflg);CHKERRQ(ierr);
+    char               vtkfilename[PETSC_MAX_PATH_LEN];
+    sprintf(vtkfilename,"%ssolution.0001.vtk",user.dataid);
     ierr = PetscViewerVTKOpen(PETSC_COMM_WORLD,vtkfilename,FILE_MODE_WRITE,&viewer);CHKERRQ(ierr);
     ierr = VecView(u,viewer);CHKERRQ(ierr);
     ierr = PetscViewerDestroy(&viewer);CHKERRQ(ierr);
