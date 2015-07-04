@@ -153,9 +153,11 @@ if (options.config_ini != None):
   # expected labels for each voltage
   voltageList = eval(config.get('setup','voltageList' ))
   for voltage,applicatorid in voltageList :
-    for controlrun,worstcasetype in [ (True,"electric_conductivity"),(False,"electric_conductivity_lb"),(False,"electric_conductivity_ub")]:
+    #for controlrun,worstcasetype in [ (True,"electric_conductivity"),(False,"electric_conductivity_lb"),(False,"electric_conductivity_ub")]:
+    for controlrun,worstcasetype in [ (True,"electric_conductivity")]:
       # id the run
       outputid = "%s.%04d.%02d.%02d" % (worstcasetype,voltage,applicatorid['tip'],applicatorid['entry'])
+      print "\n\n",outputid 
       # get applicator info 
       applicatorTipInfoCMD   = 'c3d %s -threshold %d %d 1 0 -centroid ' % (vtknerverootimage  , applicatorid['tip'  ],applicatorid['tip'  ])
       print applicatorTipInfoCMD 
