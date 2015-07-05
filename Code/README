@@ -18,6 +18,10 @@ Check BC
 ===========
 	 ./ireSolver -run_type full -dim 3 -petscspace_order 1 -variable_coefficient field  -snes_type ksponly  -snes_monitor -snes_converged_reason -ksp_converged_reason -ksp_rtol 1.e-12 -pc_type bjacobi -info -info_exclude null,pc,vec,mat -f meshIREmidres.e -vtk tissuetype/spinal14S023electric_conductivity.0500.25.30.vtk -electric_conductivity 0.286,0.286,0.286,0.286,0.286,0.286,0.286 -voltage 1500.00000 -dataid testbc
 
+Inspect Segmentations
+===========
+	for idseg in tissuetype/spinal14S0??.nii.gz; do echo  c3d $idseg $idseg -info ; done
+
 Setup Jobs 
 ===========
         for idini in zz14s02?.ini zz14s04?.ini ; do python ireSolver.py --ini=$idini ; done

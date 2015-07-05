@@ -666,6 +666,7 @@ PetscErrorCode SetupDiscretization(DM dm, AppCtx *user)
       //Vec          globalnu; // global vector
       //ierr = DMCreateGlobalVector(dmAux, &globalnu);CHKERRQ(ierr);
       ierr = PetscObjectQuery((PetscObject) dm, "A", (PetscObject *) &localnu);CHKERRQ(ierr);
+      ierr = PetscObjectSetName((PetscObject) localnu, "conductivity");CHKERRQ(ierr);
       char               vtkfilename[PETSC_MAX_PATH_LEN];
       sprintf(vtkfilename,"%smaterial.vtk",user->dataid);
       // scatter material to u

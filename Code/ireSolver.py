@@ -205,7 +205,7 @@ if (options.config_ini != None):
       spinalcordvox = eval(spinalCordInfo[0].strip(     '\n').strip('CENTROID_VOX ') )   
       axialbounds   = [ int(min(tippointvox[2],entrypointvox[2],nerverootvox[2],spinalcordvox[2])), int(max(tippointvox[2],entrypointvox[2],nerverootvox[2],spinalcordvox[2]))+1]
       roiimage            = niftiimage.replace('.nii.gz',outputid+'.vtk')
-      extractROICmd = 'c3d %s -region 0x0x%dvox %dx%dx%dvox -replace 3 1 -o %s' % (vtkimage, axialbounds[0], dimension[0],dimension[1],axialbounds[1]-axialbounds[0],roiimage )
+      extractROICmd = 'c3d %s -region 0x0x%dvox %dx%dx%dvox -o %s' % (vtkimage, axialbounds[0], dimension[0],dimension[1],axialbounds[1]-axialbounds[0],roiimage )
       print extractROICmd 
       os.system(extractROICmd )
       if(axialbounds[1] - axialbounds[0] > 10   ):
@@ -272,7 +272,7 @@ elif (options.resample != None and  options.outputid != None ):
     vtkImageReader.SetFileName(options.resample)
     vtkImageReader.Update() 
     
-    femoutputfile = "%sfem.vtk" %  options.outputid 
+    femoutputfile = "%ssolution.0001.vtk" %  options.outputid 
     vtkFemReader = vtk.vtkDataSetReader() 
     vtkFemReader.SetFileName(femoutputfile )
     vtkFemReader.Update() 
@@ -319,17 +319,49 @@ elif (options.resample != None and  options.outputid != None ):
     # write to disk
     outputimage = shifter.GetOutput() 
     #outputimage.SetScalarArrayName("arrayname")
+    print outputimage 
     #outputimage.Update()
-    vtkImageWriter = vtk.vtkDataSetWriter() 
-    vtkImageWriter.SetFileTypeToBinary() 
-    vtkImageWriter.SetInput( outputimage )
-    vtkImageWriter.SetFileName( '%s.vtk' % options.outputid )
-    vtkImageWriter.Update() 
+    vtkFEMImageWriter = vtk.vtkDataSetWriter() 
+    vtkFEMImageWriter.SetFileTypeToBinary() 
+    vtkFEMImageWriter.SetInput( outputimage )
+    vtkFEMImageWriter.SetFileName( '%s.vtk' % options.outputid )
+    vtkFEMImageWriter.Update() 
 
     # compress
     compressCMD = "c3d %s.vtk -o %s.nii.gz; " % (options.outputid ,options.outputid )
     print compressCMD 
     os.system( compressCMD )
+
+    ## matoutputfile = "%smaterial.vtk" %  options.outputid 
+    ## vtkMatReader = vtk.vtkDataSetReader() 
+    ## vtkMatReader.SetFileName(matoutputfile )
+    ## vtkMatReader.Update() 
+    ## print "matreader"
+
+    ## vtkResampleMat = vtk.vtkCompositeDataProbeFilter()
+    ## #vtkResample.SetSource( calc.GetOutput() )
+    ## vtkResampleMat.SetSource( vtkMatReader.GetOutput() )
+    ## vtkResampleMat.SetInput( vtkImageReader.GetOutput() ) 
+    ## vtkResampleMat.Update()
+    ## print "resample"
+
+    ## # FIXME - hack ensure image data
+    ## hackshifter = vtk.vtkImageShiftScale()
+    ## #hackshifter.SetShift(shift)
+    ## hackshifter.SetScale(1.0)
+    ## #hackshifter.SetOutputScalarTypeToUnsignedChar()
+    ## hackshifter.SetInput(vtkResampleMat.GetOutput() )
+    ## #hackshifter.ReleaseDataFlagOff()
+    ## hackshifter.Update()
+    ## print "shift"
+
+    ## # write to disk
+    ## print hackshifter.GetOutput()
+    ## vtkMatImageWriter = vtk.vtkDataSetWriter() 
+    ## vtkMatImageWriter.SetFileTypeToBinary() 
+    ## vtkMatImageWriter.SetInput( hackshifter.GetOutput() )
+    ## vtkMatImageWriter.SetFileName( '%smat.vtk' % options.outputid )
+    ## vtkMatImageWriter.Update() 
 
 else:
   parser.print_help()
