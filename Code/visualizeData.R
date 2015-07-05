@@ -60,6 +60,7 @@ cat( filename , "\n" )
 csvdata <- read.csv( filename ,header=TRUE , sep='\t',skip=0)
 print(head(csvdata ,n=10))
 
+terminalsubset =  subset(csvdata , Status=='T' & Voltage==667  )
 ## 
 # plot cord summary
 pdf("datasummarycord.pdf")
