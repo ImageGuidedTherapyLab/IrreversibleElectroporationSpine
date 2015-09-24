@@ -27,7 +27,7 @@ def WriteVTKPoints(vtkpoints,OutputFileName):
 
 # Applicator Transform
 def GetApplicatorTransform(pointtip,pointentry,SourceLandmarkFileName, TargetLandmarkFileName ):
-  ApplicatorTipLength = .001 #m
+  ApplicatorTipLength = .011 #m
   # template applicator center at coordinate       (0,                         0., 0. ) m
   # template applicator distal ends at coordinates (0,  0.,+/- ApplicatorTipLength/2. ) m
   originalOrientation = vtk.vtkPoints()
@@ -40,8 +40,8 @@ def GetApplicatorTransform(pointtip,pointentry,SourceLandmarkFileName, TargetLan
   print "points", pointentry, pointtip, pointscaled, slicerLength, numpy.linalg.norm( unitdirection  ), numpy.linalg.norm( pointscaled - pointtip ) 
   slicerOrientation   = vtk.vtkPoints()
   slicerOrientation.SetNumberOfPoints(2)
-  slicerOrientation.SetPoint(0,pointtip[   0],pointtip[   1],pointtip[   2] )
-  slicerOrientation.SetPoint(1,pointscaled[0],pointscaled[1],pointscaled[2] )
+  slicerOrientation.SetPoint(0,pointscaled[0],pointscaled[1],pointscaled[2] )
+  slicerOrientation.SetPoint(1,pointtip[   0],pointtip[   1],pointtip[   2] )
 
   # write landmarks to file
   WriteVTKPoints(originalOrientation,SourceLandmarkFileName)
