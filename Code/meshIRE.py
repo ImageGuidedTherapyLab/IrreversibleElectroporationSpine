@@ -16,16 +16,23 @@ cubit.cmd('webcut volume %d with plane xplane' % idhealthy)
 cubit.cmd('webcut volume %d with plane yplane' % idhealthy)
 cubit.cmd('delete volume 2 3')
 #   
-# applicator consists of two electrodes (1 cm length) placed at 1cm apart.
+# a single probe containing
+# both charged surfaces within a single needle of diameter
+# 1.65mm, with distal and proximal conducting surfaces of
+# 0.70 and 0.75cm long, respectively, separated by a 0.80 cm
+# long insulation area. These
+# applicator consists of two electrodes 7mm in length placed at 8cm apart.
+#   
+#    total length = 22mm
 ActiveDistanceFromTip = 3.0 # mm
-ActiveLength = 15.0 # mm
+ActiveLength = 11.0 # mm
 cubit.cmd('   webcut volume %d with plane zplane offset %f  ' % (idhealthy,-ActiveLength-ActiveDistanceFromTip) )
 cubit.cmd('   webcut volume %d with plane zplane offset %f  ' % (idhealthy,-ActiveLength) )
 cubit.cmd('   webcut volume %d with plane zplane offset %f  ' % (idhealthy, ActiveLength) )
 #   
 # applicator is a 17 gauge needle = 1.15mm diameter
 # 
-outerRadius  = 1.15 / 2.0 #mm
+outerRadius  = 1.65 / 2.0 #mm
 print "fiber radius = %f " % ( outerRadius )
 # create outer shell       
 cubit.cmd('create cylinder radius %f height 100' % outerRadius)
@@ -116,14 +123,14 @@ cubit.cmd('skin volume all make group 7')
 cubit.cmd('group 7 name "appface"')
 cubit.cmd('nodeset 4 node in tri in group 7')
 #cubit.cmd('nodeset 4 node in surface 60 100 129 158 172 143 114 80 90 149 178 120 remove')
-cubit.cmd('nodeset 4 node in surface 90 149 178 120 remove')
+cubit.cmd('nodeset 4 node in surface 90 149 178 120 172 143 114 80 remove')
 ## specify active electrodes by location
 ## ground electrode
-cubit.cmd('nodeset 3 node with z_coord >  5 in surface 90 149 178 120')
+cubit.cmd('nodeset 3 node with z_coord >  4 in surface 172 143 114 80 90 149 178 120')
 ## active electrode
-cubit.cmd('nodeset 2 node with z_coord < -5 in surface 90 149 178 120')
+cubit.cmd('nodeset 2 node with z_coord < -4 in surface 172 143 114 80 90 149 178 120')
 ## rest of applicator is insulated
-cubit.cmd('nodeset 4 node with z_coord > -5 and z_coord <  5 in surface 90 149 178 120')
+cubit.cmd('nodeset 4 node with z_coord > -4 and z_coord <  4 in surface 172 143 114 80 90 149 178 120')
 #cubit.cmd('nodeset 2 node in surface 90 149 178 120')
 
 #cubit.cmd('nodeset 2 name "marker"') TODO: name note used in DMPlex

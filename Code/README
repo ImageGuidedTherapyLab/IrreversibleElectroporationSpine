@@ -16,7 +16,11 @@ Create Tags
 
 Check BC
 ===========
-        ./ireSolver -run_type full -dim 3 -petscspace_order 1 -variable_coefficient field  -snes_type ksponly  -snes_monitor -snes_converged_reason -ksp_converged_reason -ksp_rtol 1.e-12 -pc_type bjacobi -info -info_exclude null,pc,vec,mat -vtk tissuetype/spinal14S023.vtk -f meshIREmidres.e  -electric_conductivity 0.100000,0.100000,0.020000,2.000000,0.012000,2.000000,0.230000 -voltage 500.000000 -solutionfile zz14s023/electric_conductivity.0500.25.30fem.vtk
+	 ./ireSolver -run_type full -dim 3 -petscspace_order 1 -variable_coefficient field  -snes_type ksponly  -snes_monitor -snes_converged_reason -ksp_converged_reason -ksp_rtol 1.e-12 -pc_type bjacobi -info -info_exclude null,pc,vec,mat -f meshIREmidres.e -vtk tissuetype/spinal14S023electric_conductivity.0500.25.30.vtk -electric_conductivity 0.286,0.286,0.286,0.286,0.286,0.286,0.286 -voltage 1500.00000 -dataid testbc
+
+Inspect Segmentations
+===========
+	for idseg in tissuetype/spinal14S0??.nii.gz; do echo  c3d $idseg $idseg -info ; done
 
 Setup Jobs 
 ===========
@@ -29,6 +33,8 @@ Setup Jobs
 	python ireSolver.py --ini=zz14s043.ini
 	python ireSolver.py --ini=zz14s048.ini
 	python ireSolver.py --ini=zz14s049.ini
+	python ireSolver.py --ini=canine15C001.ini
+	python ireSolver.py --ini=rabbit14L071.ini
 
 Run Jobs 
 ===========
@@ -49,7 +55,9 @@ Run Jobs
 Post Process Jobs 
 ===========
 
-        for idmake in exec.zz14s0??.makefile; do make -f $idmake post ; done
+        for idmake in exec.zz14s0??.makefile; do make -f $idmake post ; done > dataupdate.txt
+        grep "^[ ]*[234][0-9]" dataupdate.txt > corddata.txt
+        grep "^[ ]*1[0-9]"     dataupdate.txt > rootdata.txt
 
 Performance 
 ===========

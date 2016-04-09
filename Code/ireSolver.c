@@ -5,6 +5,19 @@
    
        Increase patchlevel to 3.5.2
 
+mpicxx -o ireSolver.o -c -g -O0   -fPIC    -I/opt/apps/PETSc/petsc-3.5.2/include -I/opt/apps/PETSc/petsc-3.5.2/arch-precise-gcc-4.6.3-dbg/include -I/usr/include -I/usr/lib/include -I/usr/include/mpich2   -I/usr/include/vtk-5.8 `pwd`/ireSolver.c
+In file included from /usr/include/c++/4.6/backward/strstream:52:0,
+                 from /usr/include/vtk-5.8/vtkIOStream.h:112,
+                 from /usr/include/vtk-5.8/vtkSystemIncludes.h:40,
+                 from /usr/include/vtk-5.8/vtkIndent.h:24,
+                 from /usr/include/vtk-5.8/vtkObjectBase.h:43,
+                 from /usr/include/vtk-5.8/vtkSmartPointerBase.h:26,
+                 from /usr/include/vtk-5.8/vtkSmartPointer.h:23,
+                 from /workarea/fuentes/github/IrreversibleElectroporationSpine/Code/ireSolver.c:20:
+/usr/include/c++/4.6/backward/backward_warning.h:33:2: warning: #warning This file includes at least one deprecated or antiquated header which may be removed without further notice at a future date. Please use a non-deprecated interface with equivalent functionality instead. For a listing of replacement headers and interfaces, consult the file backward_warning.h. To disable this warning use -Wno-deprecated. [-Wcpp]
+mpicxx -g -O0   -o ireSolver ireSolver.o -Wl,-rpath,/opt/apps/PETSc/petsc-3.5.2/arch-precise-gcc-4.6.3-dbg/lib -L/opt/apps/PETSc/petsc-3.5.2/arch-precise-gcc-4.6.3-dbg/lib  -lpetsc -Wl,-rpath,/opt/apps/MKL/12.1/lib/intel64 -L/opt/apps/MKL/12.1/lib/intel64 -lmkl_intel_lp64 -lmkl_sequential -lmkl_core -lpthread -lm -Wl,-rpath,/opt/apps/PETSc/petsc-3.5.2/arch-precise-gcc-4.6.3-dbg/lib -ltriangle -lX11 -Wl,-rpath,/usr/lib -L/usr/lib -lOpenCL -lctetgen -lpthread -lssl -lcrypto -Wl,-rpath,/usr/lib/x86_64-linux-gnu -L/usr/lib/x86_64-linux-gnu -lexoIIv2 -Wl,-rpath,/usr/lib/lib -L/usr/lib/lib -lnetcdf -lhdf5hl_fortran -lhdf5_fortran -lhdf5_hl -lhdf5 -lm -Wl,-rpath,/usr/lib/gcc/x86_64-linux-gnu/4.6 -L/usr/lib/gcc/x86_64-linux-gnu/4.6 -Wl,-rpath,/lib/x86_64-linux-gnu -L/lib/x86_64-linux-gnu -lmpichf90 -lgfortran -lm -lgfortran -lm -lquadmath -lm -lmpichcxx -lstdc++ -Wl,-rpath,/usr/lib/gcc/x86_64-linux-gnu/4.6 -L/usr/lib/gcc/x86_64-linux-gnu/4.6 -Wl,-rpath,/usr/lib/x86_64-linux-gnu -L/usr/lib/x86_64-linux-gnu -Wl,-rpath,/lib/x86_64-linux-gnu -L/lib/x86_64-linux-gnu -Wl,-rpath,/usr/lib/x86_64-linux-gnu -L/usr/lib/x86_64-linux-gnu -ldl -lmpich -lopa -lmpl -lrt -lcr -lpthread -lgcc_s -ldl   -rdynamic /usr/lib/libvtkVolumeRendering.so.5.8.0 /usr/lib/libvtkIO.so.5.8.0 /usr/lib/libvtkRendering.so.5.8.0 /usr/lib/libvtkIO.so.5.8.0 /usr/lib/libvtkGraphics.so.5.8.0 /usr/lib/libvtkImaging.so.5.8.0 /usr/lib/libvtkFiltering.so.5.8.0 /usr/lib/libvtkCommon.so.5.8.0 /usr/lib/libvtksys.so.5.8.0 /usr/lib/libvtkHybrid.so.5.8.0
+/bin/rm -f ireSolver.o
+
 */
 
 static char help[] = "Poisson Problem in 2d and 3d with simplicial finite elements.\n\
@@ -42,6 +55,7 @@ typedef struct {
   PetscInt      dim;               /* The topological mesh dimension */
   char          filename[2048];    /* The optional ExodusII file */
   char          imagefile[2048];   /* The vtk Image file */
+  char          dataid[2048];      /* tag data output */
   PetscBool     interpolate;       /* Generate intermediate mesh elements */
   PetscReal     refinementLimit;   /* The largest allowable cell volume */
   PetscBool     refinementUniform; /* Uniformly refine the mesh */
@@ -56,6 +70,7 @@ typedef struct {
   void       (**exactFuncs)(const PetscReal x[], PetscScalar *u, void *ctx);
   vtkSmartPointer<vtkLandmarkTransform> ApplicatorTransform ; 
   vtkSmartPointer<vtkImageData> ImageData ; 
+  double bounds[6];
 } AppCtx;
 
 void zero(const PetscReal coords[], PetscScalar *u, void *ctx)
@@ -150,28 +165,37 @@ void nu_2d(const PetscReal x[], PetscScalar *u, void *ctx)
   AppCtx *user= (AppCtx*) ctx;
 
   double coord[3]= {x[0],x[1],x[2]};
+  // project to boundary
+  if(coord[2] > user->bounds[5] )
+    {
+     coord[2] =  user->bounds[5] ;
+    }
+  else if(coord[2] < user->bounds[4] )
+    {
+     coord[2] =  user->bounds[4] ;
+    }
   double pcoord[3];
   int    index[3];
   //transform the point and return the intensity value
   *u = user->ElectricConductivity[0];
-  //if ( user->ImageData->ComputeStructuredCoordinates(coord,index,pcoord) )
-  // {
-  //   // get material property
-  //   PetscInt materialid = static_cast<PetscInt>( user->ImageData->GetScalarComponentAsDouble(index[0],index[1],index[2],0) );
-  //   // return electric conductivity value for this material
-  //   if (materialid < user->NmaxTissue)
-  //    {
-  //      *u = user->ElectricConductivity[materialid];
-  //    }
-  //   else
-  //    {
-  //      *u = user->ElectricConductivity[0];
-  //    }
-  // }
-  //else
-  // {
-  //   *u = user->ElectricConductivity[0];
-  // }
+  if ( user->ImageData->ComputeStructuredCoordinates(coord,index,pcoord) )
+   {
+     // get material property
+     PetscInt materialid = static_cast<PetscInt>( user->ImageData->GetScalarComponentAsDouble(index[0],index[1],index[2],0) );
+     // return electric conductivity value for this material
+     if (materialid < user->NmaxTissue)
+      {
+        *u = user->ElectricConductivity[materialid];
+      }
+     else
+      {
+        *u = user->ElectricConductivity[0];
+      }
+   }
+  else
+   {
+     *u = user->ElectricConductivity[0];
+   }
    //if(  *u < 1.e-5) * u = 0.5;
 }
 
@@ -344,6 +368,7 @@ PetscErrorCode ProcessOptions(MPI_Comm comm, AppCtx *options)
   ierr = PetscOptionsBool("-restart", "Read in the mesh and solution from a file", "ex12.c", options->restart, &options->restart, NULL);CHKERRQ(ierr);
   ierr = PetscOptionsBool("-check", "Compare with default integration routines", "ex12.c", options->check, &options->check, NULL);CHKERRQ(ierr);
   ierr = PetscOptionsString("-vtk", "vtk filename to read", "ex12.c", options->imagefile, options->imagefile, sizeof(options->imagefile), &flg);CHKERRQ(ierr);
+  ierr = PetscOptionsString("-dataid", "output data id ", "ex12.c", options->dataid, options->dataid, sizeof(options->dataid), &flg);CHKERRQ(ierr);
   if (flg)
      {
        ierr = PetscPrintf(PETSC_COMM_WORLD, "opening file...\n");CHKERRQ(ierr);
@@ -352,6 +377,10 @@ PetscErrorCode ProcessOptions(MPI_Comm comm, AppCtx *options)
        reader->Update();
        // initilize the bounding data structure
        options->ImageData = vtkImageData::SafeDownCast( reader->GetOutput()) ;
+       options->ImageData->PrintSelf(std::cout,vtkIndent());
+       options->ImageData->GetBounds(options->bounds);
+       ierr = PetscPrintf(PETSC_COMM_WORLD, "ZBounds [%f,%f] \n",
+                            options->bounds[4],options->bounds[5]);
      }
   else 
      {
@@ -637,7 +666,9 @@ PetscErrorCode SetupDiscretization(DM dm, AppCtx *user)
       //Vec          globalnu; // global vector
       //ierr = DMCreateGlobalVector(dmAux, &globalnu);CHKERRQ(ierr);
       ierr = PetscObjectQuery((PetscObject) dm, "A", (PetscObject *) &localnu);CHKERRQ(ierr);
-      char               vtkfilename[PETSC_MAX_PATH_LEN] = "material.vtk";
+      ierr = PetscObjectSetName((PetscObject) localnu, "conductivity");CHKERRQ(ierr);
+      char               vtkfilename[PETSC_MAX_PATH_LEN];
+      sprintf(vtkfilename,"%smaterial.vtk",user->dataid);
       // scatter material to u
       //ierr = DMLocalToGlobalBegin(dm, localnu, INSERT_VALUES, globalnu);CHKERRQ(ierr);
       //ierr = DMLocalToGlobalEnd(dm, localnu, INSERT_VALUES, globalnu);CHKERRQ(ierr);
@@ -668,7 +699,7 @@ PetscErrorCode SetupDiscretization(DM dm, AppCtx *user)
     // TODO: function pointers specify the boundary value
     ierr = DMPlexAddBoundary(cdm, dirichletType,  "applicator" ,  "Vertex Sets", 0, (void (*)())dirichletpotential, 1, &nodeSetApplicatorValue , user);CHKERRQ(ierr);
     ierr = DMPlexAddBoundary(cdm, dirichletType,  "ground"     ,  "Vertex Sets", 0, (void (*)())zero, 1, &nodeSetGroundValue , user);CHKERRQ(ierr);
-    ierr = DMPlexAddBoundary(cdm, dirichletType,  "neumann"    ,  "Vertex Sets", 0, (void (*)())zero, 1, &nodeSetNeumannBoundaryValue , user);CHKERRQ(ierr);
+    //ierr = DMPlexAddBoundary(cdm, dirichletType,  "neumann"    ,  "Vertex Sets", 0, (void (*)())zero, 1, &nodeSetNeumannBoundaryValue , user);CHKERRQ(ierr);
     ierr = DMPlexGetCoarseDM(cdm, &cdm);CHKERRQ(ierr);
   }
   ierr = PetscFEDestroy(&fe);CHKERRQ(ierr);
@@ -774,7 +805,8 @@ int main(int argc, char **argv)
     }
     if (write_output) {
       PetscViewer viewer;
-      char               vtkfilename[PETSC_MAX_PATH_LEN] = "solution.0000.vtk";
+      char               vtkfilename[PETSC_MAX_PATH_LEN];
+      sprintf(vtkfilename,"%ssolution.0000.vtk",user.dataid);
       ierr = PetscViewerVTKOpen(PETSC_COMM_WORLD,vtkfilename,FILE_MODE_WRITE,&viewer);CHKERRQ(ierr);
       ierr = VecView(u,viewer);CHKERRQ(ierr);
       ierr = PetscViewerDestroy(&viewer);CHKERRQ(ierr);
@@ -837,9 +869,8 @@ int main(int argc, char **argv)
 
   if (write_output) {
     PetscViewer viewer;
-    PetscBool   vtkflg;
-    char               vtkfilename[PETSC_MAX_PATH_LEN] = "solution.0001.vtk";
-    ierr = PetscOptionsString("-solutionfile", "vtk filename to write", "ex12.c", vtkfilename, vtkfilename, sizeof(vtkfilename), &vtkflg);CHKERRQ(ierr);
+    char               vtkfilename[PETSC_MAX_PATH_LEN];
+    sprintf(vtkfilename,"%ssolution.0001.vtk",user.dataid);
     ierr = PetscViewerVTKOpen(PETSC_COMM_WORLD,vtkfilename,FILE_MODE_WRITE,&viewer);CHKERRQ(ierr);
     ierr = VecView(u,viewer);CHKERRQ(ierr);
     ierr = PetscViewerDestroy(&viewer);CHKERRQ(ierr);

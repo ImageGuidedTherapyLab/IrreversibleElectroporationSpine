@@ -27,7 +27,7 @@ def WriteVTKPoints(vtkpoints,OutputFileName):
 
 # Applicator Transform
 def GetApplicatorTransform(pointtip,pointentry,SourceLandmarkFileName, TargetLandmarkFileName ):
-  ApplicatorTipLength = .001 #m
+  ApplicatorTipLength = .011 #m
   # template applicator center at coordinate       (0,                         0., 0. ) m
   # template applicator distal ends at coordinates (0,  0.,+/- ApplicatorTipLength/2. ) m
   originalOrientation = vtk.vtkPoints()
@@ -40,8 +40,8 @@ def GetApplicatorTransform(pointtip,pointentry,SourceLandmarkFileName, TargetLan
   print "points", pointentry, pointtip, pointscaled, slicerLength, numpy.linalg.norm( unitdirection  ), numpy.linalg.norm( pointscaled - pointtip ) 
   slicerOrientation   = vtk.vtkPoints()
   slicerOrientation.SetNumberOfPoints(2)
-  slicerOrientation.SetPoint(0,pointtip[   0],pointtip[   1],pointtip[   2] )
-  slicerOrientation.SetPoint(1,pointscaled[0],pointscaled[1],pointscaled[2] )
+  slicerOrientation.SetPoint(0,pointscaled[0],pointscaled[1],pointscaled[2] )
+  slicerOrientation.SetPoint(1,pointtip[   0],pointtip[   1],pointtip[   2] )
 
   # write landmarks to file
   WriteVTKPoints(originalOrientation,SourceLandmarkFileName)
@@ -126,7 +126,8 @@ if (options.config_ini != None):
   rawheaderinfo = headerProcess.stdout.readline().strip('\n')
   # rawheaderinfo = 'Image #1: dim = [512, 512, 184];  bb = {[124 124 -85], [372 372 835]};  vox = [0.484375, 0.484375, 5];  range = [0, 14];  orient = LPI'
   conversionfactor = .001
-  spacing = [conversionfactor *dxvox for  dxvox in eval(rawheaderinfo.split(";")[2].split("=")[1]) ]
+  spacing   = [conversionfactor *dxvox  for  dxvox in eval(rawheaderinfo.split(";")[2].split("=")[1]) ]
+  dimension = [              int(dxvox) for  dxvox in eval(rawheaderinfo.split(";")[0].split("=")[1]) ]
 
   # convert to meters
   convertMeterCmd = 'c3d %s -replace %s -origin 0.0x0.0x0.0mm -spacing %fx%fx%fmm -o %s' % (niftiimage,tissuereplace , spacing[0],spacing[1],spacing[2], vtkimage   )
@@ -152,9 +153,11 @@ if (options.config_ini != None):
   # expected labels for each voltage
   voltageList = eval(config.get('setup','voltageList' ))
   for voltage,applicatorid in voltageList :
-    for controlrun,worstcasetype in [ (True,"electric_conductivity"),(False,"electric_conductivity_lb"),(False,"electric_conductivity_ub")]:
+    #for controlrun,worstcasetype in [ (True,"electric_conductivity"),(False,"electric_conductivity_lb"),(False,"electric_conductivity_ub")]:
+    for controlrun,worstcasetype in [ (True,"electric_conductivity")]:
       # id the run
       outputid = "%s.%04d.%02d.%02d" % (worstcasetype,voltage,applicatorid['tip'],applicatorid['entry'])
+      print "\n\n",outputid 
       # get applicator info 
       applicatorTipInfoCMD   = 'c3d %s -threshold %d %d 1 0 -centroid ' % (vtknerverootimage  , applicatorid['tip'  ],applicatorid['tip'  ])
       print applicatorTipInfoCMD 
@@ -172,15 +175,46 @@ if (options.config_ini != None):
       applicatorEntryInfo = applicatorEntryInfoProcess.stdout.readlines()
       print applicatorEntryInfo
 
+      nerveRootInfoCMD = 'c3d %s -threshold %d %d 1 0 -centroid ' % (vtknerverootimage  , applicatorid['root'],applicatorid['root'])
+      print nerveRootInfoCMD 
+      nerveRootInfoProcess = subprocess.Popen(nerveRootInfoCMD,shell=True,stdout=subprocess.PIPE )
+      while ( nerveRootInfoProcess.poll() == None ):
+         pass
+      nerveRootInfo = nerveRootInfoProcess.stdout.readlines()
+      print nerveRootInfo
+
+      spinalCordInfoCMD = 'c3d %s -threshold %d %d 1 0 -centroid ' % (vtknerverootimage  , applicatorid['cord'],applicatorid['cord'])
+      print spinalCordInfoCMD 
+      spinalCordInfoProcess = subprocess.Popen(spinalCordInfoCMD,shell=True,stdout=subprocess.PIPE )
+      while ( spinalCordInfoProcess.poll() == None ):
+         pass
+      spinalCordInfo = spinalCordInfoProcess.stdout.readlines()
+      print spinalCordInfo
+
       # build fem command
       dmplexCmd = './ireSolver -run_type full -dim 3 -petscspace_order 1 -variable_coefficient field  -snes_type ksponly  -snes_monitor -snes_converged_reason -ksp_converged_reason -ksp_rtol 1.e-12 -pc_type bjacobi -info -info_exclude null,pc,vec,mat '
       #dmplexCmd = './tcaPointSource -run_type full -dim 3 -petscspace_order 1 -variable_coefficient field  -snes_type ksponly  -snes_monitor -snes_converged_reason -ksp_converged_reason -ksp_rtol 1.e-12 -pc_type bjacobi -info -info_exclude null,vec,mat '
-      dmplexCmd += '-vtk %s ' % vtkimage  
       dmplexCmd += '-f %s '   % config.get('setup','meshfile') 
       #tippoint   = eval(config.get('registration','tippoint'   ))
       #entrypoint = eval(config.get('registration','entrypoint' ))
-      tippoint   = [idvox*dxvox for  idvox,dxvox in zip(eval(applicatorTipInfo[0].strip(  '\n').strip('CENTROID_VOX ')    ) ,spacing)]
-      entrypoint = [idvox*dxvox for  idvox,dxvox in zip(eval(applicatorEntryInfo[0].strip('\n').strip('CENTROID_VOX ')    ) ,spacing)]
+      tippoint      = [idvox*dxvox for  idvox,dxvox in zip(eval(applicatorTipInfo[0].strip(  '\n').strip('CENTROID_VOX ')    ) ,spacing)]
+      entrypoint    = [idvox*dxvox for  idvox,dxvox in zip(eval(applicatorEntryInfo[0].strip('\n').strip('CENTROID_VOX ')    ) ,spacing)]
+      tippointvox   = eval(applicatorTipInfo[0].strip(  '\n').strip('CENTROID_VOX ') )   
+      entrypointvox = eval(applicatorEntryInfo[0].strip('\n').strip('CENTROID_VOX ') )   
+      nerverootvox  = eval(nerveRootInfo[0].strip(      '\n').strip('CENTROID_VOX ') )   
+      spinalcordvox = eval(spinalCordInfo[0].strip(     '\n').strip('CENTROID_VOX ') )   
+      print tippointvox, entrypointvox, nerverootvox, spinalcordvox 
+      domainwindowid = 2
+      domainwindowid = 0
+      axialbounds   = [ int(min(tippointvox[domainwindowid],entrypointvox[domainwindowid],nerverootvox[domainwindowid],spinalcordvox[domainwindowid])), int(max(tippointvox[domainwindowid],entrypointvox[domainwindowid],nerverootvox[domainwindowid],spinalcordvox[domainwindowid]))+1]
+      roiimage            = niftiimage.replace('.nii.gz',outputid+'.vtk')
+      extractROICmd = 'c3d %s -region 0x0x%dvox %dx%dx%dvox -o %s' % (vtkimage, axialbounds[0], dimension[0],dimension[1],axialbounds[1]-axialbounds[0],roiimage )
+      print extractROICmd 
+      os.system(extractROICmd )
+      if(axialbounds[1] - axialbounds[0] > 10   ):
+         print voltage,applicatorid 
+         raise RuntimeError("too large domain")
+      dmplexCmd += '-vtk %s ' % roiimage            
                   
       SourceLandmarkFileName = "%s/sourcelandmarks.%s.vtk" % (jobid,outputid)
       TargetLandmarkFileName = "%s/targetlandmarks.%s.vtk" % (jobid,outputid)
@@ -194,8 +228,7 @@ if (options.config_ini != None):
       dmplexCmd += '-electric_conductivity %f,%f,%f,%f,%f,%f,%f ' %  ( tissueDictionary[typeDictionary[0]],tissueDictionary[typeDictionary[1]],tissueDictionary[typeDictionary[2]], tissueDictionary[typeDictionary[3]],  tissueDictionary[typeDictionary[4]], tissueDictionary[typeDictionary[5]], tissueDictionary[typeDictionary[6]])
       #dmplexCmd += '-forcingconstant %f ' % config.getfloat('setup','forcingconstant')
       dmplexCmd += '-voltage %f ' % voltage
-      femoutputfile = "%s/%sfem.vtk" %  (jobid, outputid )
-      dmplexCmd += '-solutionfile %s ' % femoutputfile 
+      dmplexCmd += '-dataid %s/%s ' % (jobid, outputid )
 
       # create applicator model
       transform  = GetApplicatorTransform(tippoint   ,entrypoint,SourceLandmarkFileName, TargetLandmarkFileName )
@@ -242,7 +275,7 @@ elif (options.resample != None and  options.outputid != None ):
     vtkImageReader.SetFileName(options.resample)
     vtkImageReader.Update() 
     
-    femoutputfile = "%sfem.vtk" %  options.outputid 
+    femoutputfile = "%ssolution.0001.vtk" %  options.outputid 
     vtkFemReader = vtk.vtkDataSetReader() 
     vtkFemReader.SetFileName(femoutputfile )
     vtkFemReader.Update() 
@@ -289,17 +322,49 @@ elif (options.resample != None and  options.outputid != None ):
     # write to disk
     outputimage = shifter.GetOutput() 
     #outputimage.SetScalarArrayName("arrayname")
+    print outputimage 
     #outputimage.Update()
-    vtkImageWriter = vtk.vtkDataSetWriter() 
-    vtkImageWriter.SetFileTypeToBinary() 
-    vtkImageWriter.SetInput( outputimage )
-    vtkImageWriter.SetFileName( '%s.vtk' % options.outputid )
-    vtkImageWriter.Update() 
+    vtkFEMImageWriter = vtk.vtkDataSetWriter() 
+    vtkFEMImageWriter.SetFileTypeToBinary() 
+    vtkFEMImageWriter.SetInput( outputimage )
+    vtkFEMImageWriter.SetFileName( '%s.vtk' % options.outputid )
+    vtkFEMImageWriter.Update() 
 
     # compress
     compressCMD = "c3d %s.vtk -o %s.nii.gz; " % (options.outputid ,options.outputid )
     print compressCMD 
     os.system( compressCMD )
+
+    ## matoutputfile = "%smaterial.vtk" %  options.outputid 
+    ## vtkMatReader = vtk.vtkDataSetReader() 
+    ## vtkMatReader.SetFileName(matoutputfile )
+    ## vtkMatReader.Update() 
+    ## print "matreader"
+
+    ## vtkResampleMat = vtk.vtkCompositeDataProbeFilter()
+    ## #vtkResample.SetSource( calc.GetOutput() )
+    ## vtkResampleMat.SetSource( vtkMatReader.GetOutput() )
+    ## vtkResampleMat.SetInput( vtkImageReader.GetOutput() ) 
+    ## vtkResampleMat.Update()
+    ## print "resample"
+
+    ## # FIXME - hack ensure image data
+    ## hackshifter = vtk.vtkImageShiftScale()
+    ## #hackshifter.SetShift(shift)
+    ## hackshifter.SetScale(1.0)
+    ## #hackshifter.SetOutputScalarTypeToUnsignedChar()
+    ## hackshifter.SetInput(vtkResampleMat.GetOutput() )
+    ## #hackshifter.ReleaseDataFlagOff()
+    ## hackshifter.Update()
+    ## print "shift"
+
+    ## # write to disk
+    ## print hackshifter.GetOutput()
+    ## vtkMatImageWriter = vtk.vtkDataSetWriter() 
+    ## vtkMatImageWriter.SetFileTypeToBinary() 
+    ## vtkMatImageWriter.SetInput( hackshifter.GetOutput() )
+    ## vtkMatImageWriter.SetFileName( '%smat.vtk' % options.outputid )
+    ## vtkMatImageWriter.Update() 
 
 else:
   parser.print_help()
