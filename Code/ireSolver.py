@@ -203,7 +203,10 @@ if (options.config_ini != None):
       entrypointvox = eval(applicatorEntryInfo[0].strip('\n').strip('CENTROID_VOX ') )   
       nerverootvox  = eval(nerveRootInfo[0].strip(      '\n').strip('CENTROID_VOX ') )   
       spinalcordvox = eval(spinalCordInfo[0].strip(     '\n').strip('CENTROID_VOX ') )   
-      axialbounds   = [ int(min(tippointvox[2],entrypointvox[2],nerverootvox[2],spinalcordvox[2])), int(max(tippointvox[2],entrypointvox[2],nerverootvox[2],spinalcordvox[2]))+1]
+      print tippointvox, entrypointvox, nerverootvox, spinalcordvox 
+      domainwindowid = 2
+      domainwindowid = 0
+      axialbounds   = [ int(min(tippointvox[domainwindowid],entrypointvox[domainwindowid],nerverootvox[domainwindowid],spinalcordvox[domainwindowid])), int(max(tippointvox[domainwindowid],entrypointvox[domainwindowid],nerverootvox[domainwindowid],spinalcordvox[domainwindowid]))+1]
       roiimage            = niftiimage.replace('.nii.gz',outputid+'.vtk')
       extractROICmd = 'c3d %s -region 0x0x%dvox %dx%dx%dvox -o %s' % (vtkimage, axialbounds[0], dimension[0],dimension[1],axialbounds[1]-axialbounds[0],roiimage )
       print extractROICmd 

@@ -33,6 +33,8 @@ Setup Jobs
 	python ireSolver.py --ini=zz14s043.ini
 	python ireSolver.py --ini=zz14s048.ini
 	python ireSolver.py --ini=zz14s049.ini
+	python ireSolver.py --ini=canine15C001.ini
+	python ireSolver.py --ini=rabbit14L071.ini
 
 Run Jobs 
 ===========
