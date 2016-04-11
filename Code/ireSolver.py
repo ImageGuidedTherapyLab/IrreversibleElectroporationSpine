@@ -40,8 +40,8 @@ def GetApplicatorTransform(pointtip,pointentry,SourceLandmarkFileName, TargetLan
   print "points", pointentry, pointtip, pointscaled, slicerLength, numpy.linalg.norm( unitdirection  ), numpy.linalg.norm( pointscaled - pointtip ) 
   slicerOrientation   = vtk.vtkPoints()
   slicerOrientation.SetNumberOfPoints(2)
-  slicerOrientation.SetPoint(0,pointscaled[0],pointscaled[1],pointscaled[2] )
-  slicerOrientation.SetPoint(1,pointtip[   0],pointtip[   1],pointtip[   2] )
+  slicerOrientation.SetPoint(0,pointtip[   0],pointtip[   1],pointtip[   2] )
+  slicerOrientation.SetPoint(1,pointscaled[0],pointscaled[1],pointscaled[2] )
 
   # write landmarks to file
   WriteVTKPoints(originalOrientation,SourceLandmarkFileName)
@@ -203,17 +203,22 @@ if (options.config_ini != None):
       entrypointvox = eval(applicatorEntryInfo[0].strip('\n').strip('CENTROID_VOX ') )   
       nerverootvox  = eval(nerveRootInfo[0].strip(      '\n').strip('CENTROID_VOX ') )   
       spinalcordvox = eval(spinalCordInfo[0].strip(     '\n').strip('CENTROID_VOX ') )   
-      print tippointvox, entrypointvox, nerverootvox, spinalcordvox 
-      domainwindowid = 2
-      domainwindowid = 0
-      axialbounds   = [ int(min(tippointvox[domainwindowid],entrypointvox[domainwindowid],nerverootvox[domainwindowid],spinalcordvox[domainwindowid])), int(max(tippointvox[domainwindowid],entrypointvox[domainwindowid],nerverootvox[domainwindowid],spinalcordvox[domainwindowid]))+1]
+      print "extremes:", tippointvox, entrypointvox, nerverootvox, spinalcordvox 
       roiimage            = niftiimage.replace('.nii.gz',outputid+'.vtk')
-      extractROICmd = 'c3d %s -region 0x0x%dvox %dx%dx%dvox -o %s' % (vtkimage, axialbounds[0], dimension[0],dimension[1],axialbounds[1]-axialbounds[0],roiimage )
+      #FIXME -application specific hacks
+      AxialROI = True
+      AxialROI = False
+      if(AxialROI):
+        axialbounds   = [ int(min(tippointvox[2],entrypointvox[2],nerverootvox[2],spinalcordvox[2])), int(max(tippointvox[2],entrypointvox[2],nerverootvox[2],spinalcordvox[2]))+1]
+        extractROICmd = 'c3d %s -region 0x0x%dvox %dx%dx%dvox -o %s' % (vtkimage, axialbounds[0], dimension[0],dimension[1],axialbounds[1]-axialbounds[0],roiimage )
+        if(axialbounds[1] - axialbounds[0] > 10   ):
+           print voltage,applicatorid 
+           raise RuntimeError("too large domain")
+      else:
+        extractROICmd = 'c3d %s -o %s' % (vtkimage,roiimage )
+
       print extractROICmd 
       os.system(extractROICmd )
-      if(axialbounds[1] - axialbounds[0] > 10   ):
-         print voltage,applicatorid 
-         raise RuntimeError("too large domain")
       dmplexCmd += '-vtk %s ' % roiimage            
                   
       SourceLandmarkFileName = "%s/sourcelandmarks.%s.vtk" % (jobid,outputid)
@@ -225,7 +230,7 @@ if (options.config_ini != None):
       # electric_conductivity = { 'csf':2.0, 'grey':0.23 , 'white':0.23 , 'muscle':0.1 , 'bone':0.02 , 'fat':0.012 }
       typeDictionary = eval(config.get('tissue','tissue_types' ))
       tissueDictionary = eval(config.get('tissue',worstcasetype))
-      dmplexCmd += '-electric_conductivity %f,%f,%f,%f,%f,%f,%f ' %  ( tissueDictionary[typeDictionary[0]],tissueDictionary[typeDictionary[1]],tissueDictionary[typeDictionary[2]], tissueDictionary[typeDictionary[3]],  tissueDictionary[typeDictionary[4]], tissueDictionary[typeDictionary[5]], tissueDictionary[typeDictionary[6]])
+      dmplexCmd += '-electric_conductivity %12.5e,%f,%f,%f,%f,%f,%f ' %  ( tissueDictionary[typeDictionary[0]],tissueDictionary[typeDictionary[1]],tissueDictionary[typeDictionary[2]], tissueDictionary[typeDictionary[3]],  tissueDictionary[typeDictionary[4]], tissueDictionary[typeDictionary[5]], tissueDictionary[typeDictionary[6]])
       #dmplexCmd += '-forcingconstant %f ' % config.getfloat('setup','forcingconstant')
       dmplexCmd += '-voltage %f ' % voltage
       dmplexCmd += '-dataid %s/%s ' % (jobid, outputid )

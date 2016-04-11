@@ -8,7 +8,7 @@ cubit.cmd('   reset')
 
 
 # bounding box for ROI (mm)')
-cubit.cmd('create brick  width 50 height 80 depth 60')
+cubit.cmd('create brick  width 100 height 80 depth 120')
 cubit.cmd('volume 1 name "healthy" ')
 idhealthy = cubit.get_id_from_name('healthy')
 print "id" ,idhealthy
