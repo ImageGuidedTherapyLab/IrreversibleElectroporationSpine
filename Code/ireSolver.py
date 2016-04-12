@@ -154,7 +154,7 @@ if (options.config_ini != None):
   voltageList = eval(config.get('setup','voltageList' ))
   for voltage,applicatorid in voltageList :
     #for controlrun,worstcasetype in [ (True,"electric_conductivity"),(False,"electric_conductivity_lb"),(False,"electric_conductivity_ub")]:
-    for controlrun,worstcasetype in [ (True,"electric_conductivity")]:
+    for controlrun,worstcasetype in [ (True,"electric_conductivity"),(True,"electric_conductivity_lb")]:
       # id the run
       outputid = "%s.%04d.%02d.%02d" % (worstcasetype,voltage,applicatorid['tip'],applicatorid['entry'])
       print "\n\n",outputid 
@@ -192,7 +192,7 @@ if (options.config_ini != None):
       print spinalCordInfo
 
       # build fem command
-      dmplexCmd = './ireSolver -run_type full -dim 3 -petscspace_order 1 -variable_coefficient field  -snes_type ksponly  -snes_monitor -snes_converged_reason -ksp_converged_reason -ksp_rtol 1.e-12 -pc_type bjacobi -info -info_exclude null,pc,vec,mat '
+      dmplexCmd = './ireSolver -run_type full -dim 3 -petscspace_order 1 -variable_coefficient field  -snes_type ksponly  -snes_monitor -snes_converged_reason -ksp_converged_reason -ksp_rtol 1.e-6 -pc_type bjacobi -info -info_exclude null,pc,vec,mat '
       #dmplexCmd = './tcaPointSource -run_type full -dim 3 -petscspace_order 1 -variable_coefficient field  -snes_type ksponly  -snes_monitor -snes_converged_reason -ksp_converged_reason -ksp_rtol 1.e-12 -pc_type bjacobi -info -info_exclude null,vec,mat '
       dmplexCmd += '-f %s '   % config.get('setup','meshfile') 
       #tippoint   = eval(config.get('registration','tippoint'   ))
