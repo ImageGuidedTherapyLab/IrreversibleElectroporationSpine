@@ -1,0 +1,3 @@
+
+$ANTSPATH//Atropos -d 3 -a ctslice.nii.gz  -i kmeans[3] -x mask.nii.gz  -c [3,0.1] -m [0.0,1x1x1] -k Gaussian -o [ctATROPOS_GMM.nii.gz,ctATROPOS_GMM_POSTERIORS%d.nii.gz]
+
