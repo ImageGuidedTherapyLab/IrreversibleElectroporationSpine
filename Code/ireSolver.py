@@ -22,7 +22,7 @@ def WriteVTKPoints(vtkpoints,OutputFileName):
    # write to file
    polydatawriter = vtk.vtkDataSetWriter()
    polydatawriter.SetFileName(OutputFileName)
-   polydatawriter.SetInput(polydata)
+   polydatawriter.SetInputData(polydata)
    polydatawriter.Update()
 
 # Applicator Transform
@@ -78,14 +78,14 @@ def GetApplicatorTransform(pointtip,pointentry,SourceLandmarkFileName, TargetLan
 
   # transform
   slicertransformFilter = vtk.vtkTransformFilter()
-  slicertransformFilter.SetInput(vtkCylinder.GetOutput() ) 
+  slicertransformFilter.SetInputData(vtkCylinder.GetOutput() ) 
   slicertransformFilter.SetTransform( ModelLineTransform ) 
   slicertransformFilter.Update()
   apppolyData=slicertransformFilter.GetOutput();
 
   # write model to file
   vtkModelWriter = vtk.vtkDataSetWriter()
-  vtkModelWriter.SetInput(apppolyData)
+  vtkModelWriter.SetInputData(apppolyData)
   vtkModelWriter.SetFileName("applicator.vtk")
   vtkModelWriter.SetFileTypeToBinary()
   vtkModelWriter.Write()
