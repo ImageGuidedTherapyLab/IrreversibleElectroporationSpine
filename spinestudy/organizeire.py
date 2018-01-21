@@ -6,6 +6,93 @@ import subprocess
 import math
 """ IRE spine Data
 """
+# write vtk points file
+def WriteVTKPoints(vtkpoints,OutputFileName):
+   # loop over points an store in vtk data structure
+   #vtkpoints = vtk.vtkPoints()
+   vertices= vtk.vtkCellArray()
+   for idpoint in range(vtkpoints.GetNumberOfPoints()):
+       #vertices.InsertNextCell( 1 ); vertices.InsertCellPoint( vtkpoints.InsertNextPoint(point) )
+       vertices.InsertNextCell( 1 ); vertices.InsertCellPoint( idpoint )
+
+   # set polydata
+   polydata = vtk.vtkPolyData()
+   polydata.SetPoints(vtkpoints)
+   polydata.SetVerts( vertices )
+
+   # write to file
+   polydatawriter = vtk.vtkDataSetWriter()
+   polydatawriter.SetFileName(OutputFileName)
+   polydatawriter.SetInputData(polydata)
+   polydatawriter.Update()
+
+# Applicator Transform
+def GetApplicatorTransform(pointtip,pointentry,SourceLandmarkFileName, TargetLandmarkFileName ):
+  ApplicatorTipLength = .011 #m
+  # template applicator center at coordinate       (0,                         0., 0. ) m
+  # template applicator distal ends at coordinates (0,  0.,+/- ApplicatorTipLength/2. ) m
+  originalOrientation = vtk.vtkPoints()
+  originalOrientation.SetNumberOfPoints(2)
+  originalOrientation.SetPoint(0,0.,0.,         0.            )
+  originalOrientation.SetPoint(1,0.,0., ApplicatorTipLength/2.)
+  slicerLength   = numpy.linalg.norm( numpy.array(pointentry) - numpy.array(pointtip) )
+  unitdirection  = 1./slicerLength * (numpy.array(pointentry) - numpy.array(pointtip) ) 
+  pointscaled = pointtip + ApplicatorTipLength/2. * unitdirection
+  print "points", pointentry, pointtip, pointscaled, slicerLength, numpy.linalg.norm( unitdirection  ), numpy.linalg.norm( pointscaled - pointtip ) 
+  slicerOrientation   = vtk.vtkPoints()
+  slicerOrientation.SetNumberOfPoints(2)
+  slicerOrientation.SetPoint(0,pointtip[   0],pointtip[   1],pointtip[   2] )
+  slicerOrientation.SetPoint(1,pointscaled[0],pointscaled[1],pointscaled[2] )
+
+  # write landmarks to file
+  WriteVTKPoints(originalOrientation,SourceLandmarkFileName)
+  WriteVTKPoints(slicerOrientation  ,TargetLandmarkFileName)
+
+  ApplicatorLineTransform = vtk.vtkLandmarkTransform()
+  ApplicatorLineTransform.SetModeToRigidBody()
+  ApplicatorLineTransform.SetSourceLandmarks(originalOrientation)
+  ApplicatorLineTransform.SetTargetLandmarks(slicerOrientation  )
+  ApplicatorLineTransform.Update()
+  print ApplicatorLineTransform.GetMatrix()
+
+  # create model of applicator 
+  ApplicatorLength   = .10 #m
+  vtkCylinder = vtk.vtkCylinderSource()
+  vtkCylinder.SetHeight( ApplicatorLength ); 
+  vtkCylinder.SetRadius( .00075 );
+  vtkCylinder.SetCenter(0.0, 0.0, 0.0 );
+  vtkCylinder.SetResolution(16);
+  vtkCylinder.SetCapping(1);
+
+  # model orientation
+  modelOrientation = vtk.vtkPoints()
+  modelOrientation.SetNumberOfPoints(2)
+  modelOrientation.SetPoint(0, 0.,         0.         ,0. )
+  modelOrientation.SetPoint(1, 0.,-ApplicatorLength/2.,0. )
+
+  ModelLineTransform = vtk.vtkLandmarkTransform()
+  ModelLineTransform.SetModeToRigidBody()
+  ModelLineTransform.SetSourceLandmarks(modelOrientation   )
+  ModelLineTransform.SetTargetLandmarks(slicerOrientation  )
+  ModelLineTransform.Update()
+  print ModelLineTransform.GetMatrix()
+
+  # transform
+  slicertransformFilter = vtk.vtkTransformFilter()
+  slicertransformFilter.SetInputData(vtkCylinder.GetOutput() ) 
+  slicertransformFilter.SetTransform( ModelLineTransform ) 
+  slicertransformFilter.Update()
+  apppolyData=slicertransformFilter.GetOutput();
+
+  # write model to file
+  vtkModelWriter = vtk.vtkDataSetWriter()
+  vtkModelWriter.SetInputData(apppolyData)
+  vtkModelWriter.SetFileName("applicator.vtk")
+  vtkModelWriter.SetFileTypeToBinary()
+  vtkModelWriter.Write()
+  # return transform
+  return ApplicatorLineTransform
+
 
 # setup command line parser to control execution
 from optparse import OptionParser
@@ -68,8 +155,8 @@ if (options.setup ):
      setupfile.write('#S/m;\n') 
      setupfile.write("electric_conductivity    = { 'csf':2.0, 'cord':0.23 , 'applicator':2.0 ,'default':0.1  ,'muscle':0.1 , 'bone':0.02  , 'fat':0.012 } \n")
      setupfile.write('[setup]\n') 
-     setupfile.write("voltageList = [  (500,{'tip':25, 'entry':30, 'root':16, 'cord':35}) ]\n")
-     setupfile.write("imagefile = %s/applicator.nii.gz\n" % localdir )
+     setupfile.write("voltageList = [  (500,{'tip':1, 'entry':2, 'root':4, 'cord':3}) ]\n")
+     setupfile.write("imagefile = %s/setup.nii.gz\n" % localdir )
      setupfile.write("meshfile  = meshIREmidres.e\n")
      setupfile.close()
   
@@ -118,8 +205,7 @@ elif (options.config_ini != None):
   # expected labels for each voltage
   voltageList = eval(config.get('setup','voltageList' ))
   for voltage,applicatorid in voltageList :
-    #for controlrun,worstcasetype in [ (True,"electric_conductivity"),(False,"electric_conductivity_lb"),(False,"electric_conductivity_ub")]:
-    for controlrun,worstcasetype in [ (True,"electric_conductivity"),(True,"electric_conductivity_lb")]:
+    for controlrun,worstcasetype in [ (True,"electric_conductivity")]:
       # id the run
       outputid = "%s.%04d.%02d.%02d" % (worstcasetype,voltage,applicatorid['tip'],applicatorid['entry'])
       print "\n\n",outputid 
@@ -186,8 +272,8 @@ elif (options.config_ini != None):
       os.system(extractROICmd )
       dmplexCmd += '-vtk %s ' % roiimage            
                   
-      SourceLandmarkFileName = "%s/sourcelandmarks.%s.vtk" % (jobid,outputid)
-      TargetLandmarkFileName = "%s/targetlandmarks.%s.vtk" % (jobid,outputid)
+      SourceLandmarkFileName = "%s/sourcelandmarks.%s.vtk" % (jobdir,outputid)
+      TargetLandmarkFileName = "%s/targetlandmarks.%s.vtk" % (jobdir,outputid)
       dmplexCmd += '-sourcelandmark %s ' % SourceLandmarkFileName
       dmplexCmd += '-targetlandmark %s ' % TargetLandmarkFileName
       # tissue dictionary should be of the form
@@ -198,7 +284,7 @@ elif (options.config_ini != None):
       dmplexCmd += '-electric_conductivity %12.5e,%f,%f,%f,%f,%f,%f ' %  ( tissueDictionary[typeDictionary[0]],tissueDictionary[typeDictionary[1]],tissueDictionary[typeDictionary[2]], tissueDictionary[typeDictionary[3]],  tissueDictionary[typeDictionary[4]], tissueDictionary[typeDictionary[5]], tissueDictionary[typeDictionary[6]])
       #dmplexCmd += '-forcingconstant %f ' % config.getfloat('setup','forcingconstant')
       dmplexCmd += '-voltage %f ' % voltage
-      dmplexCmd += '-dataid %s/%s ' % (jobid, outputid )
+      dmplexCmd += '-dataid %s/%s ' % (jobdir, outputid )
 
       # create applicator model
       transform  = GetApplicatorTransform(tippoint   ,entrypoint,SourceLandmarkFileName, TargetLandmarkFileName )
@@ -213,15 +299,14 @@ elif (options.config_ini != None):
         jobListPost.append('%s.post' % outputid  )
 
       # rsample back to image
-      fileHandle.write('\tpython ./ireSolver.py --resample=%s --outputid=%s/%s\n' %  (vtkimage,jobid,outputid) )
+      fileHandle.write('\tpython ./ireSolver.py --resample=%s --outputid=%s/%s\n' %  (vtkimage,jobdir,outputid) )
 
       # avg in nerve root
       fileHandle.write('%s.post: \n' %   outputid  )
       #FIXME header accuracy causing problems
-      #avgCMD = "c3d %s/%s.nii.gz  %s -lstat > %s/%s.txt"  % (jobid,outputid ,vtknerverootimage ,jobid, outputid )
-      avgCMD = "c3d %s/%s.vtk  %s -lstat > %s/%s.txt"  % (jobid,outputid ,vtknerverootimage ,jobid, outputid )
+      avgCMD = "c3d %s/%s.vtk  %s -lstat > %s/%s.txt"  % (jobdir,outputid ,vtknerverootimage ,jobdir, outputid )
       fileHandle.write('\t%s \n' %  avgCMD )
-      rootCMD = 'echo root;head -n 1 %s/%s.txt; grep "^[ ]*%d\|^[ ]*%d" %s/%s.txt'  % (jobid, outputid ,applicatorid['root'],applicatorid['cord'],jobid, outputid )
+      rootCMD = 'echo root;head -n 1 %s/%s.txt; grep "^[ ]*%d\|^[ ]*%d" %s/%s.txt'  % (jobdir, outputid ,applicatorid['root'],applicatorid['cord'],jobdir, outputid )
       fileHandle.write('\t%s \n' %  rootCMD )
       
   # tune
