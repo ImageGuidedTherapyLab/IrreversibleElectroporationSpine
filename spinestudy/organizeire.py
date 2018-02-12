@@ -23,7 +23,7 @@ def WriteVTKPoints(vtkpoints,OutputFileName):
    # write to file
    polydatawriter = vtk.vtkDataSetWriter()
    polydatawriter.SetFileName(OutputFileName)
-   polydatawriter.SetInputData(polydata)
+   polydatawriter.SetInput(polydata)
    polydatawriter.Update()
 
 # Applicator Transform
@@ -79,14 +79,14 @@ def GetApplicatorTransform(pointtip,pointentry,SourceLandmarkFileName, TargetLan
 
   # transform
   slicertransformFilter = vtk.vtkTransformFilter()
-  slicertransformFilter.SetInputData(vtkCylinder.GetOutput() ) 
+  slicertransformFilter.SetInput(vtkCylinder.GetOutput() ) 
   slicertransformFilter.SetTransform( ModelLineTransform ) 
   slicertransformFilter.Update()
   apppolyData=slicertransformFilter.GetOutput();
 
   # write model to file
   vtkModelWriter = vtk.vtkDataSetWriter()
-  vtkModelWriter.SetInputData(apppolyData)
+  vtkModelWriter.SetInput(apppolyData)
   vtkModelWriter.SetFileName("applicator.vtk")
   vtkModelWriter.SetFileTypeToBinary()
   vtkModelWriter.Write()
@@ -178,12 +178,12 @@ if (options.setup ):
      setupfile = open('%s/setup.ini' % localdir ,'w') 
      setupfile.write('[tissue]\n') 
      setupfile.write('tissue_replace = 100 0\n') 
-     setupfile.write("tissue_types = {  13:'cord' , 12:'csf' , 11:'applicator',10:'applicator', 0:'default' ,3:'muscle' , 4:'bone' , 2:'fat' }\n") 
+     setupfile.write("tissue_types = {  6:'cord' , 5:'csf' , 3:'applicator', 0:'default' ,1:'muscle' , 2:'bone' , 4:'fat' }\n") 
      setupfile.write('#S/m;\n') 
      setupfile.write("electric_conductivity    = { 'csf':2.0, 'cord':0.23 , 'applicator':2.0 ,'default':0.1  ,'muscle':0.1 , 'bone':0.02  , 'fat':0.012 } \n")
      setupfile.write('[setup]\n') 
      setupfile.write("voltageList = [  (500,{'tip':10, 'entry':11, 'root':4, 'cord':3}) ]\n")
-     setupfile.write("imagefile = %s/setup.nii.gz\n" % localdir )
+     setupfile.write("imagefile = %s/setupgmm.nii.gz\n" % localdir )
      setupfile.write("meshfile  = meshIREmidres.e\n")
      setupfile.close()
   
