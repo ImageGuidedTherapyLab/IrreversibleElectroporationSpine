@@ -113,6 +113,7 @@ parser.add_option( "--outputid",
 
 if (options.setup ):
   import MySQLdb
+  # HACK get applicators first to ID
   sqldb = MySQLdb.connect(host="scrdep2.mdanderson.org",    # your host, usually localhost
                           read_default_file="~/.my.cnf",    # username password
                           db="DFElectroporation")        # name of the data base
@@ -123,15 +124,30 @@ if (options.setup ):
   """
   sqlcur.execute(querydata)
   queryNames= [description[0] for description in sqlcur.description]
+  datalistapplicator = [dict(zip(queryNames,x)) for x in sqlcur]
+  sqldb.close()
+
+  # HACK get all labels
+  sqldb = MySQLdb.connect(host="scrdep1.mdanderson.org",    # your host, usually localhost
+                          read_default_file="~/.my.cnf",    # username password
+                          db="redmine_default")        # name of the data base
+  sqlcur = sqldb.cursor()
+  querydata= """ 
+  SELECT path uid FROM redmine_default.external_files f where f.study_id = 107 and content_type = 5 and path like '%Tomas%';
+  """
+  sqlcur.execute(querydata)
+  queryNames= [description[0] for description in sqlcur.description]
   datalist = [dict(zip(queryNames,x)) for x in sqlcur]
+  sqldb.close()
   print queryNames #, queryDict
   
+  #for iddata in datalist[:1]:
   for iddata in datalist:
      uidinfo =  iddata['uid'].split('/')
      datadir = uidinfo [0]
-     localdir =  '/'.join(uidinfo[:-1]) + '/' + uidinfo[-1].replace('.annotationSignature.nii.gz','')
-     seriesdir = "/FUS4/IPVL_research_anno/" + "/".join(uidinfo [:-1])
-     imageuid = uidinfo [4].replace('.annotationSignature.nii.gz','')
+     localdir =  'datalocation/' + '/'.join(uidinfo[1:-1]) + '/' + uidinfo[-1].replace('.TomasAnnotation.nii.gz','')
+     seriesdir = "/FUS4/IPVL_research_anno/" + "/".join(uidinfo [1:-1])
+     imageuid = uidinfo [-1].replace('.TomasAnnotation.nii.gz','')
      imagenumber = int(imageuid.split('.')[-1])
      print datadir,localdir, seriesdir ,imageuid ,imagenumber
      filelist = []
@@ -141,21 +157,32 @@ if (options.setup ):
      createlocaldir = 'mkdir -p %s/dicom; cp %s %s/dicom; DicomSeriesReadImageWrite2 %s/dicom %s/anatomy.nii.gz' %(localdir,' '.join(filelist),localdir,localdir,localdir)
      print createlocaldir 
      # FIXME check if file exists
-     #os.system( createlocaldir )
-     copyannotation = "c3d %s/anatomy.nii.gz /FUS4/IPVL_research_anno/%s -pad 0x0x5vox 0x0x4vox  0 -copy-transform -info -type uchar -o %s/applicator.nii.gz" % (localdir, iddata['uid'],localdir)
+     if ( not os.path.isfile('%s/anatomy.nii.gz' % localdir)) :
+        os.system( createlocaldir )
+     # FIXME - HACK - copy-transform not working unless break into steps
+     copyannotation = "c3d /FUS4/%s -pad 0x0x5vox 0x0x4vox  0 -o %s/labeltmp.nii.gz; c3d %s/anatomy.nii.gz %s/labeltmp.nii.gz -copy-transform  -type uchar -o %s/label.nii.gz -info " % (iddata['uid'], localdir,localdir, localdir, localdir)
+     print copyannotation 
+     os.system( copyannotation )
+
+  # HACK - separate query to ID applicator
+  for iddata in datalistapplicator:
+     uidinfo =  iddata['uid'].split('/')
+     datadir = uidinfo [0]
+     localdir =  'datalocation/' +'/'.join(uidinfo[:-1]) + '/' + uidinfo[-1].replace('.annotationSignature.nii.gz','')
+     # FIXME - HACK - copy-transform not working unless break into steps
+     copyannotation = "c3d /FUS4/IPVL_research_anno/%s -pad 0x0x5vox 0x0x4vox  0 -o %s/applicatortmp.nii.gz; c3d %s/anatomy.nii.gz %s/applicatortmp.nii.gz -copy-transform  -type uchar -o %s/applicator.nii.gz -info " % (iddata['uid'], localdir,localdir, localdir, localdir)
      print copyannotation 
      # FIXME check if file exists
-     #os.system( copyannotation )
-
+     os.system( copyannotation )
      # write setup file
      setupfile = open('%s/setup.ini' % localdir ,'w') 
      setupfile.write('[tissue]\n') 
      setupfile.write('tissue_replace = 100 0\n') 
-     setupfile.write("tissue_types = {  6:'cord' , 5:'csf' , 3:'applicator', 0:'default' ,1:'muscle' , 2:'bone' , 4:'fat' }\n") 
+     setupfile.write("tissue_types = {  13:'cord' , 12:'csf' , 11:'applicator',10:'applicator', 0:'default' ,3:'muscle' , 4:'bone' , 2:'fat' }\n") 
      setupfile.write('#S/m;\n') 
      setupfile.write("electric_conductivity    = { 'csf':2.0, 'cord':0.23 , 'applicator':2.0 ,'default':0.1  ,'muscle':0.1 , 'bone':0.02  , 'fat':0.012 } \n")
      setupfile.write('[setup]\n') 
-     setupfile.write("voltageList = [  (500,{'tip':1, 'entry':2, 'root':4, 'cord':3}) ]\n")
+     setupfile.write("voltageList = [  (500,{'tip':10, 'entry':11, 'root':4, 'cord':3}) ]\n")
      setupfile.write("imagefile = %s/setup.nii.gz\n" % localdir )
      setupfile.write("meshfile  = meshIREmidres.e\n")
      setupfile.close()

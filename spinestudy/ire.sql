@@ -22,3 +22,5 @@ CREATE TABLE DFElectroporation.metadata(
 
 
 select concat(concat_ws('/',replace(rf.mrn,' ','_'),REPLACE(rf.StudyDate, '-', ''),rf.StudyUID,rf.seriesuid),'/CT.',rf.imageuid,'.annotationSignature.nii.gz') uid from DFElectroporation.metadata rf where rf.studyuid not like "%control%";
+SELECT description filename, path niftypath, SUBSTRING(path,1,CHAR_LENGTH(path) - 27) ReferenceSOPUID , StudyUID, SeriesUID, StudyDate,f.* FROM redmine_default.external_files f where f.study_id = 107 and content_type = 5 and path like '%Tomas%';
+SELECT path niftypath FROM redmine_default.external_files f where f.study_id = 107 and content_type = 5 and path like '%Tomas%';
