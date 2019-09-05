@@ -4,7 +4,7 @@
 
 CFLAGS           =
 FFLAGS		 =
-CPPFLAGS	 = -I/usr/include/vtk-5.8
+CPPFLAGS	 = -I/usr/include/vtk-5.10
 FPPFLAGS         =
 LOCDIR		 = src/snes/examples/tutorials/
 MANSEC           = SNES
@@ -82,7 +82,7 @@ ex9: ex9.o chkopts
 ex10: ex10.o chkopts
 	-${CLINKER} -o ex10 ex10.o ${PETSC_SNES_LIB}
 	${RM} ex10.o
-VTK_LIB = -rdynamic /usr/lib/libvtkVolumeRendering.so.5.8.0 /usr/lib/libvtkIO.so.5.8.0 /usr/lib/libvtkRendering.so.5.8.0 /usr/lib/libvtkIO.so.5.8.0 /usr/lib/libvtkGraphics.so.5.8.0 /usr/lib/libvtkImaging.so.5.8.0 /usr/lib/libvtkFiltering.so.5.8.0 /usr/lib/libvtkCommon.so.5.8.0 /usr/lib/libvtksys.so.5.8.0 /usr/lib/libvtkHybrid.so.5.8.0
+VTK_LIB = -rdynamic /usr/lib/libvtkVolumeRendering.so.5.10 /usr/lib/libvtkIO.so.5.10 /usr/lib/libvtkRendering.so.5.10 /usr/lib/libvtkIO.so.5.10 /usr/lib/libvtkGraphics.so.5.10 /usr/lib/libvtkImaging.so.5.10 /usr/lib/libvtkFiltering.so.5.10 /usr/lib/libvtkCommon.so.5.10 /usr/lib/libvtksys.so.5.10 /usr/lib/libvtkHybrid.so.5.10
 ireSolver: ireSolver.o chkopts
 	-${CLINKER} -o ireSolver ireSolver.o ${PETSC_SNES_LIB} ${VTK_LIB}
 	${RM} ireSolver.o

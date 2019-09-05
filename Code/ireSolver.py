@@ -22,7 +22,7 @@ def WriteVTKPoints(vtkpoints,OutputFileName):
    # write to file
    polydatawriter = vtk.vtkDataSetWriter()
    polydatawriter.SetFileName(OutputFileName)
-   polydatawriter.SetInput(polydata)
+   polydatawriter.SetInputData(polydata)
    polydatawriter.Update()
 
 # Applicator Transform
@@ -40,8 +40,8 @@ def GetApplicatorTransform(pointtip,pointentry,SourceLandmarkFileName, TargetLan
   print "points", pointentry, pointtip, pointscaled, slicerLength, numpy.linalg.norm( unitdirection  ), numpy.linalg.norm( pointscaled - pointtip ) 
   slicerOrientation   = vtk.vtkPoints()
   slicerOrientation.SetNumberOfPoints(2)
-  slicerOrientation.SetPoint(0,pointscaled[0],pointscaled[1],pointscaled[2] )
-  slicerOrientation.SetPoint(1,pointtip[   0],pointtip[   1],pointtip[   2] )
+  slicerOrientation.SetPoint(0,pointtip[   0],pointtip[   1],pointtip[   2] )
+  slicerOrientation.SetPoint(1,pointscaled[0],pointscaled[1],pointscaled[2] )
 
   # write landmarks to file
   WriteVTKPoints(originalOrientation,SourceLandmarkFileName)
@@ -78,14 +78,14 @@ def GetApplicatorTransform(pointtip,pointentry,SourceLandmarkFileName, TargetLan
 
   # transform
   slicertransformFilter = vtk.vtkTransformFilter()
-  slicertransformFilter.SetInput(vtkCylinder.GetOutput() ) 
+  slicertransformFilter.SetInputData(vtkCylinder.GetOutput() ) 
   slicertransformFilter.SetTransform( ModelLineTransform ) 
   slicertransformFilter.Update()
   apppolyData=slicertransformFilter.GetOutput();
 
   # write model to file
   vtkModelWriter = vtk.vtkDataSetWriter()
-  vtkModelWriter.SetInput(apppolyData)
+  vtkModelWriter.SetInputData(apppolyData)
   vtkModelWriter.SetFileName("applicator.vtk")
   vtkModelWriter.SetFileTypeToBinary()
   vtkModelWriter.Write()
@@ -154,7 +154,7 @@ if (options.config_ini != None):
   voltageList = eval(config.get('setup','voltageList' ))
   for voltage,applicatorid in voltageList :
     #for controlrun,worstcasetype in [ (True,"electric_conductivity"),(False,"electric_conductivity_lb"),(False,"electric_conductivity_ub")]:
-    for controlrun,worstcasetype in [ (True,"electric_conductivity")]:
+    for controlrun,worstcasetype in [ (True,"electric_conductivity"),(True,"electric_conductivity_lb")]:
       # id the run
       outputid = "%s.%04d.%02d.%02d" % (worstcasetype,voltage,applicatorid['tip'],applicatorid['entry'])
       print "\n\n",outputid 
@@ -192,7 +192,7 @@ if (options.config_ini != None):
       print spinalCordInfo
 
       # build fem command
-      dmplexCmd = './ireSolver -run_type full -dim 3 -petscspace_order 1 -variable_coefficient field  -snes_type ksponly  -snes_monitor -snes_converged_reason -ksp_converged_reason -ksp_rtol 1.e-12 -pc_type bjacobi -info -info_exclude null,pc,vec,mat '
+      dmplexCmd = './ireSolver -run_type full -dim 3 -petscspace_order 1 -variable_coefficient field  -snes_type ksponly  -snes_monitor -snes_converged_reason -ksp_converged_reason -ksp_rtol 1.e-6 -pc_type bjacobi -info -info_exclude null,pc,vec,mat '
       #dmplexCmd = './tcaPointSource -run_type full -dim 3 -petscspace_order 1 -variable_coefficient field  -snes_type ksponly  -snes_monitor -snes_converged_reason -ksp_converged_reason -ksp_rtol 1.e-12 -pc_type bjacobi -info -info_exclude null,vec,mat '
       dmplexCmd += '-f %s '   % config.get('setup','meshfile') 
       #tippoint   = eval(config.get('registration','tippoint'   ))
@@ -203,17 +203,22 @@ if (options.config_ini != None):
       entrypointvox = eval(applicatorEntryInfo[0].strip('\n').strip('CENTROID_VOX ') )   
       nerverootvox  = eval(nerveRootInfo[0].strip(      '\n').strip('CENTROID_VOX ') )   
       spinalcordvox = eval(spinalCordInfo[0].strip(     '\n').strip('CENTROID_VOX ') )   
-      print tippointvox, entrypointvox, nerverootvox, spinalcordvox 
-      domainwindowid = 2
-      domainwindowid = 0
-      axialbounds   = [ int(min(tippointvox[domainwindowid],entrypointvox[domainwindowid],nerverootvox[domainwindowid],spinalcordvox[domainwindowid])), int(max(tippointvox[domainwindowid],entrypointvox[domainwindowid],nerverootvox[domainwindowid],spinalcordvox[domainwindowid]))+1]
+      print "extremes:", tippointvox, entrypointvox, nerverootvox, spinalcordvox 
       roiimage            = niftiimage.replace('.nii.gz',outputid+'.vtk')
-      extractROICmd = 'c3d %s -region 0x0x%dvox %dx%dx%dvox -o %s' % (vtkimage, axialbounds[0], dimension[0],dimension[1],axialbounds[1]-axialbounds[0],roiimage )
+      #FIXME -application specific hacks
+      AxialROI = True
+      AxialROI = False
+      if(AxialROI):
+        axialbounds   = [ int(min(tippointvox[2],entrypointvox[2],nerverootvox[2],spinalcordvox[2])), int(max(tippointvox[2],entrypointvox[2],nerverootvox[2],spinalcordvox[2]))+1]
+        extractROICmd = 'c3d %s -region 0x0x%dvox %dx%dx%dvox -o %s' % (vtkimage, axialbounds[0], dimension[0],dimension[1],axialbounds[1]-axialbounds[0],roiimage )
+        if(axialbounds[1] - axialbounds[0] > 10   ):
+           print voltage,applicatorid 
+           raise RuntimeError("too large domain")
+      else:
+        extractROICmd = 'c3d %s -o %s' % (vtkimage,roiimage )
+
       print extractROICmd 
       os.system(extractROICmd )
-      if(axialbounds[1] - axialbounds[0] > 10   ):
-         print voltage,applicatorid 
-         raise RuntimeError("too large domain")
       dmplexCmd += '-vtk %s ' % roiimage            
                   
       SourceLandmarkFileName = "%s/sourcelandmarks.%s.vtk" % (jobid,outputid)
@@ -225,7 +230,7 @@ if (options.config_ini != None):
       # electric_conductivity = { 'csf':2.0, 'grey':0.23 , 'white':0.23 , 'muscle':0.1 , 'bone':0.02 , 'fat':0.012 }
       typeDictionary = eval(config.get('tissue','tissue_types' ))
       tissueDictionary = eval(config.get('tissue',worstcasetype))
-      dmplexCmd += '-electric_conductivity %f,%f,%f,%f,%f,%f,%f ' %  ( tissueDictionary[typeDictionary[0]],tissueDictionary[typeDictionary[1]],tissueDictionary[typeDictionary[2]], tissueDictionary[typeDictionary[3]],  tissueDictionary[typeDictionary[4]], tissueDictionary[typeDictionary[5]], tissueDictionary[typeDictionary[6]])
+      dmplexCmd += '-electric_conductivity %12.5e,%f,%f,%f,%f,%f,%f ' %  ( tissueDictionary[typeDictionary[0]],tissueDictionary[typeDictionary[1]],tissueDictionary[typeDictionary[2]], tissueDictionary[typeDictionary[3]],  tissueDictionary[typeDictionary[4]], tissueDictionary[typeDictionary[5]], tissueDictionary[typeDictionary[6]])
       #dmplexCmd += '-forcingconstant %f ' % config.getfloat('setup','forcingconstant')
       dmplexCmd += '-voltage %f ' % voltage
       dmplexCmd += '-dataid %s/%s ' % (jobid, outputid )
