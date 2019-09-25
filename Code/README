@@ -36,7 +36,7 @@ Setup Jobs
 	python ireSolver.py --ini=canine15C001.ini
 	python ireSolver.py --ini=rabbit14L071.ini
 	python ireSolver.py --ini=mouseM251.ini
-
+	python ireSolver.py --ini=zz15cL5.ini
 Run Jobs 
 ===========
 
