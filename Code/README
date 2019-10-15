@@ -22,6 +22,11 @@ Inspect Segmentations
 ===========
 	for idseg in tissuetype/spinal14S0??.nii.gz; do echo  c3d $idseg $idseg -info ; done
 
+Molina Example
+===========
+	python ireSolver.py --ini=zz15cL5.ini
+	make -f exec.zz15cL5.makefile
+
 Setup Jobs 
 ===========
         for idini in zz14s02?.ini zz14s04?.ini ; do python ireSolver.py --ini=$idini ; done
@@ -36,7 +41,6 @@ Setup Jobs
 	python ireSolver.py --ini=canine15C001.ini
 	python ireSolver.py --ini=rabbit14L071.ini
 	python ireSolver.py --ini=mouseM251.ini
-	python ireSolver.py --ini=zz15cL5.ini
 Run Jobs 
 ===========
 

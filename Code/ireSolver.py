@@ -154,7 +154,7 @@ if (options.config_ini != None):
   voltageList = eval(config.get('setup','voltageList' ))
   for voltage,applicatorid in voltageList :
     #for controlrun,worstcasetype in [ (True,"electric_conductivity"),(False,"electric_conductivity_lb"),(False,"electric_conductivity_ub")]:
-    for controlrun,worstcasetype in [ (True,"electric_conductivity"),(True,"electric_conductivity_lb")]:
+    for controlrun,worstcasetype in [ (True,"electric_conductivity")]:
       # id the run
       outputid = "%s.%04d.%02d.%02d" % (worstcasetype,voltage,applicatorid['tip'],applicatorid['entry'])
       print "\n\n",outputid 
