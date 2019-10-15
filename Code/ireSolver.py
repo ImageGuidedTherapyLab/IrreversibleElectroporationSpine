@@ -306,13 +306,13 @@ elif (options.resample != None and  options.outputid != None ):
 
     vtkResample = vtk.vtkCompositeDataProbeFilter()
     #vtkResample.SetSource( calc.GetOutput() )
-    vtkResample.SetSource( vtkFemReader.GetOutput() )
-    vtkResample.SetInput( vtkImageReader.GetOutput() ) 
+    vtkResample.SetSourceData( vtkFemReader.GetOutput() )
+    vtkResample.SetInputData( vtkImageReader.GetOutput() ) 
     vtkResample.Update()
 
     # compute gradient of resampled image
     vtkGradMagn = vtk.vtkImageGradientMagnitude()
-    vtkGradMagn.SetInput( vtkResample.GetOutput() ) 
+    vtkGradMagn.SetInputData( vtkResample.GetOutput() ) 
     vtkGradMagn.Update()
 
     # convert efield to V/cm
@@ -320,7 +320,7 @@ elif (options.resample != None and  options.outputid != None ):
     #shifter.SetShift(shift)
     shifter.SetScale(.01)
     #shifter.SetOutputScalarTypeToUnsignedChar()
-    shifter.SetInput(vtkGradMagn.GetOutput() )
+    shifter.SetInputData(vtkGradMagn.GetOutput() )
     #shifter.ReleaseDataFlagOff()
     shifter.Update()
 
@@ -331,7 +331,7 @@ elif (options.resample != None and  options.outputid != None ):
     #outputimage.Update()
     vtkFEMImageWriter = vtk.vtkDataSetWriter() 
     vtkFEMImageWriter.SetFileTypeToBinary() 
-    vtkFEMImageWriter.SetInput( outputimage )
+    vtkFEMImageWriter.SetInputData( outputimage )
     vtkFEMImageWriter.SetFileName( '%s.vtk' % options.outputid )
     vtkFEMImageWriter.Update() 
 
