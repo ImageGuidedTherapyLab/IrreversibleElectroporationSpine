@@ -24,8 +24,20 @@ Inspect Segmentations
 
 Molina Example
 ===========
+	python ireSolver.py --ini=zz15cL1.ini
+	make -f exec.zz15cL1.makefile
+
+	python ireSolver.py --ini=zz15cL3.ini
+	make -f exec.zz15cL3.makefile
+
 	python ireSolver.py --ini=zz15cL5.ini
 	make -f exec.zz15cL5.makefile
+
+	python ireSolver.py --ini=zz15cL11.ini
+	make -f exec.zz15cL11.makefile
+
+	python ireSolver.py --ini=zz15cL12.ini
+	make -f exec.zz15cL12.makefile
 
 Setup Jobs 
 ===========
