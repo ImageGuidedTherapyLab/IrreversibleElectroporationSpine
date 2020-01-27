@@ -39,6 +39,8 @@ Molina Example
 	python ireSolver.py --ini=zz15cL12.ini
 	make -f exec.zz15cL12.makefile
 
+        for idmake in exec.zz15cL*.makefile; do make -f $idmake post ; done > datatest.txt
+
 Setup Jobs 
 ===========
         for idini in zz14s02?.ini zz14s04?.ini ; do python ireSolver.py --ini=$idini ; done
