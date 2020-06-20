@@ -39,6 +39,14 @@ Molina Example
 	python ireSolver.py --ini=zz15cL12.ini
 	make -f exec.zz15cL12.makefile
 
+        python ireSolver.py --ini=zz15c002L1.ini ;  make -f exec.zz15c002L1.makefile
+        python ireSolver.py --ini=zz15c002L12.ini;  make -f exec.zz15c002L12.makefile
+        python ireSolver.py --ini=zz15c002L3.ini ;  make -f exec.zz15c002L3.makefile
+        python ireSolver.py --ini=zz15c002L5.ini ;  make -f exec.zz15c002L5.makefile
+        python ireSolver.py --ini=zz15c003L12.ini;  make -f exec.zz15c003L12.makefile
+        python ireSolver.py --ini=zz15c003L3.ini ;  make -f exec.zz15c003L3.makefile
+        python ireSolver.py --ini=zz15c003L5.ini ;  make -f exec.zz15c003L5.makefile
+
         for idmake in exec.zz15cL*.makefile; do make -f $idmake post ; done > datatest.txt
 
 Setup Jobs 
