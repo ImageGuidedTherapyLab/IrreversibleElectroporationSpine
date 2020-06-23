@@ -256,7 +256,7 @@ if (options.config_ini != None):
       #avgCMD = "c3d %s/%s.nii.gz  %s -lstat > %s/%s.txt"  % (jobid,outputid ,vtknerverootimage ,jobid, outputid )
       avgCMD = "c3d %s/%s.vtk  %s -lstat > %s/%s.txt"  % (jobid,outputid ,vtknerverootimage ,jobid, outputid )
       fileHandle.write('\t%s \n' %  avgCMD )
-      rootCMD = 'echo root;head -n 1 %s/%s.txt; grep "^[ ]*%d\|^[ ]*%d" %s/%s.txt'  % (jobid, outputid ,applicatorid['root'],applicatorid['cord'],jobid, outputid )
+      rootCMD = 'echo root;head -n 1 %s/%s.txt; cat %s/%s.txt'  % (jobid, outputid , jobid, outputid )
       fileHandle.write('\t%s \n' %  rootCMD )
       
   # tune
