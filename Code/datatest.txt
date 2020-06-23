@@ -1,0 +1,72 @@
+exec.zz15c002L12.makefile
+c3d zz15c002L12/electric_conductivity.2700.29.34.vtk  '6.20.20 Run/15C002/15C002 - T12/T12_Segmentation_EM.nerve.vtk' -lstat > zz15c002L12/electric_conductivity.2700.29.34.txt 
+echo root;head -n 1 zz15c002L12/electric_conductivity.2700.29.34.txt; grep "^[ ]*11\|^[ ]*24" zz15c002L12/electric_conductivity.2700.29.34.txt 
+root
+LabelID        Mean        StdD         Max         Min       Count     Vol(mm^3)        Extent(Vox)
+   11     116.23402    89.87948   363.02562    24.73162         168         0.000     17    16     2
+   24    2876.16019  5109.32658  18362.59362     0.00000         914         0.000    121   137     1
+exec.zz15c002L1.makefile
+c3d zz15c002L1/electric_conductivity.2700.29.34.vtk  '6.20.20 Run/15C002/15C002 - L1/L1-Segmentation_EM.nerve.vtk' -lstat > zz15c002L1/electric_conductivity.2700.29.34.txt 
+echo root;head -n 1 zz15c002L1/electric_conductivity.2700.29.34.txt; grep "^[ ]*11\|^[ ]*24" zz15c002L1/electric_conductivity.2700.29.34.txt 
+root
+LabelID        Mean        StdD         Max         Min       Count     Vol(mm^3)        Extent(Vox)
+   11     154.54765    50.02505   291.44006   109.55923          77         0.000     12    11     1
+   24    2785.86153  5437.00053  19164.99681     0.00000         862         0.000    188    63     1
+exec.zz15c002L3.makefile
+exec.zz15c002L5.makefile
+c3d zz15c002L5/electric_conductivity.2700.29.34.vtk  '6.20.20 Run/15C002/15C002 - L5/L5_Segmentation_EM.nerve.vtk' -lstat > zz15c002L5/electric_conductivity.2700.29.34.txt 
+echo root;head -n 1 zz15c002L5/electric_conductivity.2700.29.34.txt; grep "^[ ]*11\|^[ ]*24" zz15c002L5/electric_conductivity.2700.29.34.txt 
+root
+LabelID        Mean        StdD         Max         Min       Count     Vol(mm^3)        Extent(Vox)
+   11      47.43346    20.42133    83.20222    11.79902         127         0.000     20    19     7
+   24    2528.44084  6633.02341  24461.89708     0.00000        1119         0.000    177   168     1
+exec.zz15c003L12.makefile
+exec.zz15c003L3.makefile
+c3d zz15c003L3/electric_conductivity.2700.29.34.vtk  '6.20.20 Run/15C00332/redo_09_18_2018/15C003 - L3/L3_Segmentation_EM.nerve.vtk' -lstat > zz15c003L3/electric_conductivity.2700.29.34.txt 
+echo root;head -n 1 zz15c003L3/electric_conductivity.2700.29.34.txt; grep "^[ ]*11\|^[ ]*24" zz15c003L3/electric_conductivity.2700.29.34.txt 
+root
+LabelID        Mean        StdD         Max         Min       Count     Vol(mm^3)        Extent(Vox)
+   11     198.82829    42.57100   286.95084    99.94580          34         0.000      6     8     1
+   24    4276.05632  8237.35665  23923.46599     0.00000         964         0.000    139   125     1
+exec.zz15c003L5.makefile
+c3d zz15c003L5/electric_conductivity.2700.29.34.vtk  '6.20.20 Run/15C00332/redo_09_18_2018/15C003 - L5/L5_Segmentation_EM.nerve.vtk' -lstat > zz15c003L5/electric_conductivity.2700.29.34.txt 
+echo root;head -n 1 zz15c003L5/electric_conductivity.2700.29.34.txt; grep "^[ ]*11\|^[ ]*24" zz15c003L5/electric_conductivity.2700.29.34.txt 
+root
+LabelID        Mean        StdD         Max         Min       Count     Vol(mm^3)        Extent(Vox)
+   11      36.46468    15.94802    86.65442     4.08555          52         0.000     13     6     2
+   24    4088.08316  6113.76711  16862.59312     0.00000         712         0.000    134    65     1
+exec.zz15cL11.makefile
+c3d zz15cL11/electric_conductivity.2700.29.34.vtk  '15C001_1.26.20/15C001 - T11/T11Segmentation_EM.nerve.vtk' -lstat > zz15cL11/electric_conductivity.2700.29.34.txt 
+echo root;head -n 1 zz15cL11/electric_conductivity.2700.29.34.txt; grep "^[ ]*11\|^[ ]*24" zz15cL11/electric_conductivity.2700.29.34.txt 
+root
+LabelID        Mean        StdD         Max         Min       Count     Vol(mm^3)        Extent(Vox)
+   11     117.09178    46.05736   260.73125    49.03252         128         0.000     13    16     1
+   24    2966.75380  4156.80244  12880.82774     0.00000         525         0.000     86    95     1
+exec.zz15cL12.makefile
+c3d zz15cL12/electric_conductivity.2700.29.34.vtk  '15C001_1.26.20/15C001 - T12/T12Segmentation_EM.nerve.vtk' -lstat > zz15cL12/electric_conductivity.2700.29.34.txt 
+echo root;head -n 1 zz15cL12/electric_conductivity.2700.29.34.txt; grep "^[ ]*11\|^[ ]*24" zz15cL12/electric_conductivity.2700.29.34.txt 
+root
+LabelID        Mean        StdD         Max         Min       Count     Vol(mm^3)        Extent(Vox)
+   11     129.37412   107.34905   478.35261    20.23260         465         0.000     27    25     7
+   24    2220.06870  4932.09351  14584.71552     0.00000         364         0.000     92    94     1
+exec.zz15cL1.makefile
+c3d zz15cL1/electric_conductivity.2700.29.34.vtk  '15C001_1.26.20/15C001 - L1 redo_real/L1Segmentation_EM.nerve.vtk' -lstat > zz15cL1/electric_conductivity.2700.29.34.txt 
+echo root;head -n 1 zz15cL1/electric_conductivity.2700.29.34.txt; grep "^[ ]*11\|^[ ]*24" zz15cL1/electric_conductivity.2700.29.34.txt 
+root
+LabelID        Mean        StdD         Max         Min       Count     Vol(mm^3)        Extent(Vox)
+   11      17.06621    13.45160    53.63207     2.69886          39         0.000      8    10     1
+   24    2667.54277  4761.23662  14404.54507     0.00000         644         0.000    126    75     1
+exec.zz15cL3.makefile
+c3d zz15cL3/electric_conductivity.2700.29.34.vtk  '15C001_1.26.20/15C001 - L3/L3Segmentation_EM.nerve.vtk' -lstat > zz15cL3/electric_conductivity.2700.29.34.txt 
+echo root;head -n 1 zz15cL3/electric_conductivity.2700.29.34.txt; grep "^[ ]*11\|^[ ]*24" zz15cL3/electric_conductivity.2700.29.34.txt 
+root
+LabelID        Mean        StdD         Max         Min       Count     Vol(mm^3)        Extent(Vox)
+   11      27.67566    14.11698    62.30537     5.87409          60         0.000      8    11     1
+   24    2827.39401  4757.06345  13041.20940     0.00000         723         0.000    126    96     1
+exec.zz15cL5.makefile
+c3d zz15cL5/electric_conductivity.2700.29.34.vtk  '15C001_1.26.20/15C001 - L5/L5Segmentation_EM.nerve.vtk' -lstat > zz15cL5/electric_conductivity.2700.29.34.txt 
+echo root;head -n 1 zz15cL5/electric_conductivity.2700.29.34.txt; grep "^[ ]*11\|^[ ]*24" zz15cL5/electric_conductivity.2700.29.34.txt 
+root
+LabelID        Mean        StdD         Max         Min       Count     Vol(mm^3)        Extent(Vox)
+   11      18.61812     8.23629    37.42046     5.10193         117         0.000     14    10     2
+   24    4126.52205  7225.86139  19847.75018     0.00000         589         0.000     99    94     1
