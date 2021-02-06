@@ -1,3 +1,10 @@
+docker setup
+==================
+
+docker pull ubuntu:xenial
+docker run  -it --rm  --name ire ubuntu:xenial
+
+
 DMPlexApplications
 ==================
 
