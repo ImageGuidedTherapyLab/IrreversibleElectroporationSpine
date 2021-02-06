@@ -154,7 +154,7 @@ if (options.config_ini != None):
   voltageList = eval(config.get('setup','voltageList' ))
   for voltage,applicatorid in voltageList :
     #for controlrun,worstcasetype in [ (True,"electric_conductivity"),(False,"electric_conductivity_lb"),(False,"electric_conductivity_ub")]:
-    for controlrun,worstcasetype in [ (True,"electric_conductivity"),(True,"electric_conductivity_lb")]:
+    for controlrun,worstcasetype in [ (True,"electric_conductivity")]:
       # id the run
       outputid = "%s.%04d.%02d.%02d" % (worstcasetype,voltage,applicatorid['tip'],applicatorid['entry'])
       print "\n\n",outputid 
@@ -256,7 +256,7 @@ if (options.config_ini != None):
       #avgCMD = "c3d %s/%s.nii.gz  %s -lstat > %s/%s.txt"  % (jobid,outputid ,vtknerverootimage ,jobid, outputid )
       avgCMD = "c3d %s/%s.vtk  %s -lstat > %s/%s.txt"  % (jobid,outputid ,vtknerverootimage ,jobid, outputid )
       fileHandle.write('\t%s \n' %  avgCMD )
-      rootCMD = 'echo root;head -n 1 %s/%s.txt; grep "^[ ]*%d\|^[ ]*%d" %s/%s.txt'  % (jobid, outputid ,applicatorid['root'],applicatorid['cord'],jobid, outputid )
+      rootCMD = 'echo root;head -n 1 %s/%s.txt; cat %s/%s.txt'  % (jobid, outputid , jobid, outputid )
       fileHandle.write('\t%s \n' %  rootCMD )
       
   # tune
@@ -306,13 +306,13 @@ elif (options.resample != None and  options.outputid != None ):
 
     vtkResample = vtk.vtkCompositeDataProbeFilter()
     #vtkResample.SetSource( calc.GetOutput() )
-    vtkResample.SetSource( vtkFemReader.GetOutput() )
-    vtkResample.SetInput( vtkImageReader.GetOutput() ) 
+    vtkResample.SetSourceData( vtkFemReader.GetOutput() )
+    vtkResample.SetInputData( vtkImageReader.GetOutput() ) 
     vtkResample.Update()
 
     # compute gradient of resampled image
     vtkGradMagn = vtk.vtkImageGradientMagnitude()
-    vtkGradMagn.SetInput( vtkResample.GetOutput() ) 
+    vtkGradMagn.SetInputData( vtkResample.GetOutput() ) 
     vtkGradMagn.Update()
 
     # convert efield to V/cm
@@ -320,7 +320,7 @@ elif (options.resample != None and  options.outputid != None ):
     #shifter.SetShift(shift)
     shifter.SetScale(.01)
     #shifter.SetOutputScalarTypeToUnsignedChar()
-    shifter.SetInput(vtkGradMagn.GetOutput() )
+    shifter.SetInputData(vtkGradMagn.GetOutput() )
     #shifter.ReleaseDataFlagOff()
     shifter.Update()
 
@@ -331,7 +331,7 @@ elif (options.resample != None and  options.outputid != None ):
     #outputimage.Update()
     vtkFEMImageWriter = vtk.vtkDataSetWriter() 
     vtkFEMImageWriter.SetFileTypeToBinary() 
-    vtkFEMImageWriter.SetInput( outputimage )
+    vtkFEMImageWriter.SetInputData( outputimage )
     vtkFEMImageWriter.SetFileName( '%s.vtk' % options.outputid )
     vtkFEMImageWriter.Update() 
 

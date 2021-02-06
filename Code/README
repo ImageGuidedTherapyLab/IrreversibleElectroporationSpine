@@ -1,3 +1,10 @@
+docker setup
+==================
+
+docker pull ubuntu:xenial
+docker run  -it --rm  --name ire ubuntu:xenial
+
+
 DMPlexApplications
 ==================
 
@@ -22,6 +29,33 @@ Inspect Segmentations
 ===========
 	for idseg in tissuetype/spinal14S0??.nii.gz; do echo  c3d $idseg $idseg -info ; done
 
+Molina Example
+===========
+	python ireSolver.py --ini=zz15cL1.ini
+	make -f exec.zz15cL1.makefile
+
+	python ireSolver.py --ini=zz15cL3.ini
+	make -f exec.zz15cL3.makefile
+
+	python ireSolver.py --ini=zz15cL5.ini
+	make -f exec.zz15cL5.makefile
+
+	python ireSolver.py --ini=zz15cL11.ini
+	make -f exec.zz15cL11.makefile
+
+	python ireSolver.py --ini=zz15cL12.ini
+	make -f exec.zz15cL12.makefile
+
+        python ireSolver.py --ini=zz15c002L1.ini ;  make -f exec.zz15c002L1.makefile
+        python ireSolver.py --ini=zz15c002L12.ini;  make -f exec.zz15c002L12.makefile
+        python ireSolver.py --ini=zz15c002L3.ini ;  make -f exec.zz15c002L3.makefile
+        python ireSolver.py --ini=zz15c002L5.ini ;  make -f exec.zz15c002L5.makefile
+        python ireSolver.py --ini=zz15c003L12.ini;  make -f exec.zz15c003L12.makefile
+        python ireSolver.py --ini=zz15c003L3.ini ;  make -f exec.zz15c003L3.makefile
+        python ireSolver.py --ini=zz15c003L5.ini ;  make -f exec.zz15c003L5.makefile
+
+        for idmake in exec.zz15c*.makefile; do echo $idmake ; make -f $idmake post ; done > datatest.txt
+
 Setup Jobs 
 ===========
         for idini in zz14s02?.ini zz14s04?.ini ; do python ireSolver.py --ini=$idini ; done
@@ -36,7 +70,6 @@ Setup Jobs
 	python ireSolver.py --ini=canine15C001.ini
 	python ireSolver.py --ini=rabbit14L071.ini
 	python ireSolver.py --ini=mouseM251.ini
-
 Run Jobs 
 ===========
 
