@@ -2,7 +2,14 @@ docker setup
 ==================
 
 docker pull ubuntu:xenial
-docker run  -it --rm  --name ire ubuntu:xenial
+
+docker image rm iresolver 
+
+Get-Content Dockerfile | docker build -t iresolver -
+
+docker image ls
+
+docker run  -it --rm  --name ire iresolver
 
 
 DMPlexApplications
@@ -13,7 +20,6 @@ Configure options (Ubuntu 12.04):
 	apt-get install libnetcdf-dev
 	apt-get install libhdf5-serial-dev
 	apt-get install libexodusii-dev libexodusii5
-
 
 	./config/configure.py --with-shared-libraries --with-clanguage=c++ --CFLAGS='-g -O0' --CXXFLAGS='-g -O0' --download-ctetgen  --download-triangle --with-debugging=yes --with-blas-lapack-dir=/opt/apps/MKL/12.1/lib/intel64/  --with-exodusii-lib=[/usr/lib/x86_64-linux-gnu/libexoIIv2.so] --with-netcdf-dir=/usr/lib --with-hdf5-dir=/usr/lib --with-c2html=0 --with-exodusii-include=/usr/include  --with-opencl-include=/usr/include/ --with-opencl-lib=/usr/lib/libOpenCL.so  --download-viennacl=yes
 
