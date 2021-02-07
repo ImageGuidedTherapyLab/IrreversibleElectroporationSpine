@@ -6,6 +6,7 @@ docker pull ubuntu:xenial
 docker image rm iresolver 
 
 Get-Content Dockerfile | docker build -t iresolver -
+docker build -t iresolver .
 
 docker image ls
 
