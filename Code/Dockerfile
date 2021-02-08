@@ -39,15 +39,16 @@ ENV PETSC_ARCH arch-linux2-c-debug
 
 WORKDIR $PETSC_DIR
 
-## # Configure and build PETSc.
-## RUN ./config/configure.py --with-shared-libraries --with-clanguage=c++ --CFLAGS='-g -O0' --CXXFLAGS='-g -O0' --download-ctetgen  --download-triangle --with-debugging=yes  --download-fblaslapack   --download-netcdf  --download-exodusii --download-hdf5  --with-c2html=0
-## RUN make all
-## # RUN make test
-##    
-## # Add the newly compiled libraries to the environment.
-## ENV LD_LIBRARY_PATH $PETSC_DIR/$PETSC_ARCH/lib
-## ENV PKG_CONFIG_PATH $PETSC_DIR/$PETSC_ARCH/lib/pkgconfig
-## 
-## WORKDIR /home/${USER_NAME}
-## RUN git clone https://github.com/ImageGuidedTherapyLab/IrreversibleElectroporationSpine.git
-## WORKDIR /home/${USER_NAME}/IrreversibleElectroporationSpine/Code
+# Configure and build PETSc.
+RUN ./config/configure.py --with-shared-libraries --with-clanguage=c++ --CFLAGS='-g -O0' --CXXFLAGS='-g -O0' --download-ctetgen  --download-triangle --with-debugging=yes  --download-fblaslapack   --download-netcdf  --download-exodusii --download-hdf5  --with-c2html=0
+RUN make all
+# RUN make test
+   
+# Add the newly compiled libraries to the environment.
+ENV LD_LIBRARY_PATH $PETSC_DIR/$PETSC_ARCH/lib
+ENV PKG_CONFIG_PATH $PETSC_DIR/$PETSC_ARCH/lib/pkgconfig
+
+WORKDIR /home/${USER_NAME}
+RUN git clone https://github.com/ImageGuidedTherapyLab/IrreversibleElectroporationSpine.git
+WORKDIR /home/${USER_NAME}/IrreversibleElectroporationSpine/Code
+RUN make ireSolver 
