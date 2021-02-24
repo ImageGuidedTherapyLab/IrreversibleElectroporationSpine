@@ -15,6 +15,7 @@ RUN apt-get install -y exuberant-ctags
 RUN apt-get install -y libopenmpi-dev openmpi-bin openssh-client m4 zlib1g-dev cmake
 RUN apt-get install -y python-vtk
 
+
 # setup non root user
 ARG USER_NAME="ire"
 RUN adduser --disabled-password --gecos '' --shell /bin/bash ${USER_NAME}
@@ -41,7 +42,8 @@ ENV PETSC_ARCH arch-linux2-c-debug
 WORKDIR $PETSC_DIR
 
 # Configure and build PETSc.
-RUN ./config/configure.py --with-shared-libraries --with-clanguage=c++ --CFLAGS='-g -O0' --CXXFLAGS='-g -O0' --download-ctetgen  --download-triangle --with-debugging=yes  --download-fblaslapack   --download-netcdf  --download-exodusii --download-hdf5  --with-c2html=0
+#RUN ./config/configure.py --with-shared-libraries --with-clanguage=c++ --CFLAGS='-g -O0' --CXXFLAGS='-g -O0' --download-ctetgen  --download-triangle --with-debugging=yes  --download-fblaslapack   --download-netcdf  --download-exodusii --download-hdf5  --with-c2html=0
+RUN ./config/configure.py --with-shared-libraries --with-clanguage=c++ --download-ctetgen  --download-triangle --with-debugging=no  --download-fblaslapack   --download-netcdf  --download-exodusii --download-hdf5  --with-c2html=0
 RUN make all
 # RUN make test
    
@@ -49,6 +51,10 @@ RUN make all
 ENV LD_LIBRARY_PATH $PETSC_DIR/$PETSC_ARCH/lib
 ENV PKG_CONFIG_PATH $PETSC_DIR/$PETSC_ARCH/lib/pkgconfig
 
+# more deps
+USER root
+RUN apt-get install -y python-numpy
+USER ${USER_NAME}
 # WORKDIR /home/${USER_NAME}
 # RUN git clone https://github.com/ImageGuidedTherapyLab/IrreversibleElectroporationSpine.git
 # WORKDIR /home/${USER_NAME}/IrreversibleElectroporationSpine/Code

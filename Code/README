@@ -13,6 +13,10 @@ docker image ls
 
 docker run  -it --rm  --name ire iresolver
 
+docker login --username=fuentesdt
+docker tag 55833f98bf4e fuentesdt/iresolver:latest
+docker push fuentesdt/iresolver
+
 
 DMPlexApplications
 ==================
