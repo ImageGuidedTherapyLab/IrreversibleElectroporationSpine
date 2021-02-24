@@ -13,6 +13,7 @@ RUN apt-get install -y exuberant-ctags
 # PETSc requires BLAS, LAPACK and MPI.
 #RUN apt-get install -y libblas-dev liblapack-dev libopenmpi-dev openmpi-bin openssh-client
 RUN apt-get install -y libopenmpi-dev openmpi-bin openssh-client m4 zlib1g-dev cmake
+RUN apt-get install -y python-vtk
 
 # setup non root user
 ARG USER_NAME="ire"
@@ -48,7 +49,9 @@ RUN make all
 ENV LD_LIBRARY_PATH $PETSC_DIR/$PETSC_ARCH/lib
 ENV PKG_CONFIG_PATH $PETSC_DIR/$PETSC_ARCH/lib/pkgconfig
 
-WORKDIR /home/${USER_NAME}
-RUN git clone https://github.com/ImageGuidedTherapyLab/IrreversibleElectroporationSpine.git
-WORKDIR /home/${USER_NAME}/IrreversibleElectroporationSpine/Code
-RUN make ireSolver 
+# WORKDIR /home/${USER_NAME}
+# RUN git clone https://github.com/ImageGuidedTherapyLab/IrreversibleElectroporationSpine.git
+# WORKDIR /home/${USER_NAME}/IrreversibleElectroporationSpine/Code
+# RUN make ireSolver 
+# 
+# ENTRYPOINT ["python", "ireSolver.py"]
