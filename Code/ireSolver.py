@@ -272,6 +272,10 @@ if (options.config_ini != None):
   with file(jobmakefilename  , 'r') as original: datastream = original.read()
   # FIXME subset hack
   with file(jobmakefilename  , 'w') as modified: modified.write( "#all: ZZ14S026 ZZ14S025 ZZ14S023 ZZ14S024\nall: %s \npost: %s \n" % (' '.join(jobList),' '.join(jobListPost)) + datastream)
+  # run the rest of it
+  runandpostCMD = 'make -f %s all post' % jobmakefilename  
+  print runandpostCMD 
+  os.system( runandpostCMD )
 
 elif (options.resample != None and  options.outputid != None ):
     # resample back to image
