@@ -13,7 +13,6 @@ RUN apt-get install -y exuberant-ctags
 # PETSc requires BLAS, LAPACK and MPI.
 #RUN apt-get install -y libblas-dev liblapack-dev libopenmpi-dev openmpi-bin openssh-client
 RUN apt-get install -y libopenmpi-dev openmpi-bin openssh-client m4 zlib1g-dev cmake
-RUN apt-get install -y python-vtk
 
 
 # setup non root user
@@ -53,7 +52,7 @@ ENV PKG_CONFIG_PATH $PETSC_DIR/$PETSC_ARCH/lib/pkgconfig
 
 # more deps
 USER root
-RUN apt-get install -y python-numpy
+RUN apt-get install -y python-numpy python-vtk6
 USER ${USER_NAME}
 # WORKDIR /home/${USER_NAME}
 # RUN git clone https://github.com/ImageGuidedTherapyLab/IrreversibleElectroporationSpine.git
