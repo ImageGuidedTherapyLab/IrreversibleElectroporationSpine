@@ -11,13 +11,13 @@ docker build -t iresolver iresolver
 
 docker image ls
 
-docker run  -it --rm  --name ire iresolver
+docker run  -it --rm -v $PWD:/home/ire --name ire iresolver
 
 docker login --username=fuentesdt
 docker tag 55833f98bf4e fuentesdt/iresolver:latest
 docker push fuentesdt/iresolver
 
-docker run -it --rm -v $PWD:/home/ire/IrreversibleElectroporationSpine/Code --user $(id -u):$(id -g) iresolver --ini=zz15cL1.ini
+docker run -it --rm -v $PWD:/data --user $(id -u):$(id -g) iresolver --ini=zz15cL1.ini
 
 
 DMPlexApplications

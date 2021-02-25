@@ -192,7 +192,7 @@ if (options.config_ini != None):
       print spinalCordInfo
 
       # build fem command
-      dmplexCmd = './ireSolver -run_type full -dim 3 -petscspace_order 1 -variable_coefficient field  -snes_type ksponly  -snes_monitor -snes_converged_reason -ksp_converged_reason -ksp_rtol 1.e-6 -pc_type bjacobi -info -info_exclude null,pc,vec,mat '
+      dmplexCmd = '/home/ire/IrreversibleElectroporationSpine/Code/ireSolver -run_type full -dim 3 -petscspace_order 1 -variable_coefficient field  -snes_type ksponly  -snes_monitor -snes_converged_reason -ksp_converged_reason -ksp_rtol 1.e-6 -pc_type bjacobi -info -info_exclude null,pc,vec,mat '
       #dmplexCmd = './tcaPointSource -run_type full -dim 3 -petscspace_order 1 -variable_coefficient field  -snes_type ksponly  -snes_monitor -snes_converged_reason -ksp_converged_reason -ksp_rtol 1.e-12 -pc_type bjacobi -info -info_exclude null,vec,mat '
       dmplexCmd += '-f %s '   % config.get('setup','meshfile') 
       #tippoint   = eval(config.get('registration','tippoint'   ))
