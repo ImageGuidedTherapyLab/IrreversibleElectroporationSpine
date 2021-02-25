@@ -14,7 +14,7 @@ docker image ls
 docker run  -it --rm -v $PWD:/home/ire --name ire iresolver
 
 docker login --username=fuentesdt
-docker tag 55833f98bf4e fuentesdt/iresolver:latest
+docker tag d79c73277914 fuentesdt/iresolver:latest
 docker push fuentesdt/iresolver
 
 docker run -it --rm -v $PWD:/data --user $(id -u):$(id -g) iresolver --ini=zz15cL1.ini

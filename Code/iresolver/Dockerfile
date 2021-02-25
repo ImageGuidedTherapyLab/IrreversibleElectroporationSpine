@@ -3,8 +3,8 @@ MAINTAINER David Fuentes, fuentesdt@gmail.com
 ARG USER_NAME="ire"
 
 USER root
-COPY c3d /usr/local/bin
 RUN mkdir /data
+COPY c3d /usr/local/bin
 RUN chmod 777 /data
 USER ${USER_NAME}
 WORKDIR /home/${USER_NAME}
