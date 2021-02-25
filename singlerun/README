@@ -1,5 +1,400 @@
 Usage
 =====
-
 docker pull fuentesdt/iresolver:latest
+
+Linux
+=====
 docker run -it --rm -v $PWD:/data --user $(id -u):$(id -g) iresolver --ini=zz15cL1.ini
+
+Win10
+=====
+docker run -it --rm -v C:\Users\dtfuentes\GoogleDrive\github\IrreversibleElectroporationSpine\singlerun:/data  fuentesdt/iresolver:latest --ini=zz15cL1.ini
+
+
+
+Expected Output
+===============
+
+PS C:\Users\dtfuentes\GoogleDrive\github\IrreversibleElectroporationSpine\singlerun> docker pull fuentesdt/iresolver:latest
+latest: Pulling from fuentesdt/iresolver
+4007a89234b4: Already exists
+5dfa26c6b9c9: Already exists
+0ba7bf18aa40: Already exists
+4c6ec688ebe3: Already exists
+f37cae9e1666: Pull complete
+3ce4b1c351f7: Pull complete
+5ff7b5df0efa: Pull complete
+251990f5c63d: Pull complete
+3eb6dd8a0705: Pull complete
+854fb0bc4e92: Pull complete
+5c01fd5e15fc: Pull complete
+d4ea80f4ee6b: Pull complete
+a8c7a6fba9fc: Pull complete
+dab62ab5e43b: Pull complete
+bcf8fb75612c: Pull complete
+72a0318efac3: Pull complete
+a092f5057787: Pull complete
+9a2107e6d8d8: Pull complete
+e094bf9c6f41: Pull complete
+e82bfc065789: Pull complete
+6db7fb3e2dcf: Pull complete
+8d7f85700efd: Pull complete
+Digest: sha256:c7d2e473365195c8b3bdb4785ce9521643c193ecf1f3a492ad05a4503ab816d7
+Status: Downloaded newer image for fuentesdt/iresolver:latest
+docker.io/fuentesdt/iresolver:latest
+
+
+
+
+PS C:\Users\dtfuentes\GoogleDrive\github\IrreversibleElectroporationSpine\singlerun> docker run -it --rm -v C:\Users\dtfuentes\GoogleDri
+ve\github\IrreversibleElectroporationSpine\singlerun:/data  fuentesdt/iresolver:latest --ini=zz15cL1.ini
+c3d '15C001_1.26.20/15C001 - L1 redo_real/L1Segmentation_EM.nii.gz' -info
+c3d '15C001_1.26.20/15C001 - L1 redo_real/L1Segmentation_EM.nii.gz' -replace 9  6 10  6 11  6 12  6 13  6 14  6 15  6 16  6 17  6 18  6
+19  6 7  3 8  3 20  3 21  3 22  3 23  3 24  3 25  3 26  3 27  3 28  3 29  3 30  3 31  3 32  3 33  3 34  3 35   6 36   6 37   6 38   6 39
+   6 40   6 41   6 42   6 -origin 0.0x0.0x0.0mm -spacing 0.000352x0.000352x0.003996mm -o '15C001_1.26.20/15C001 - L1 redo_real/L1Segment
+ation_EM.vtk'
+c3d '15C001_1.26.20/15C001 - L1 redo_real/L1Segmentation_EM.nii.gz' -origin 0.0x0.0x0.0mm -spacing 0.000352x0.000352x0.003996mm -o '15C0
+01_1.26.20/15C001 - L1 redo_real/L1Segmentation_EM.nerve.vtk'
+
+
+electric_conductivity.2700.29.34
+c3d '15C001_1.26.20/15C001 - L1 redo_real/L1Segmentation_EM.nerve.vtk' -threshold 29 29 1 0 -centroid
+['CENTROID_VOX [256.214, 246.357, 3]\n', 'CENTROID_MM [-0.0901874, -0.0867177, 0.011988]\n']
+c3d '15C001_1.26.20/15C001 - L1 redo_real/L1Segmentation_EM.nerve.vtk' -threshold 34 34 1 0 -centroid
+['CENTROID_VOX [126.677, 320.581, 3]\n', 'CENTROID_MM [-0.0445905, -0.112844, 0.011988]\n']
+c3d '15C001_1.26.20/15C001 - L1 redo_real/L1Segmentation_EM.nerve.vtk' -threshold 11 11 1 0 -centroid
+['CENTROID_VOX [228.333, 269.205, 0]\n', 'CENTROID_MM [-0.0803733, -0.0947602, 0]\n']
+c3d '15C001_1.26.20/15C001 - L1 redo_real/L1Segmentation_EM.nerve.vtk' -threshold 24 24 1 0 -centroid
+['CENTROID_VOX [192.104, 283.707, 3]\n', 'CENTROID_MM [-0.0676206, -0.0998647, 0.011988]\n']
+extremes: [256.214, 246.357, 3] [126.677, 320.581, 3] [228.333, 269.205, 0] [192.104, 283.707, 3]
+c3d '15C001_1.26.20/15C001 - L1 redo_real/L1Segmentation_EM.vtk' -o '15C001_1.26.20/15C001 - L1 redo_real/L1Segmentation_EMelectric_cond
+uctivity.2700.29.34.vtk'
+points [0.044539633200000005, 0.11271627960000001, 0.01198803] [0.0900848424, 0.08661912120000001, 0.01198803] [ 0.08531273  0.08935352
+ 0.01198803] 0.0524921685361 1.0 0.0055
+vtkMatrix4x4 (0x2b54b80)
+  Debug: Off
+  Modified Time: 700
+  Reference Count: 2
+  Registered Events: (none)
+  Elements:
+    0.24717 0.431367 -0.867658 0.0900848
+    0.431367 0.75283 0.497162 0.0866191
+    0.867658 -0.497162 1.11022e-16 0.011988
+    0 0 0 1
+
+
+vtkMatrix4x4 (0x251ae50)
+  Debug: Off
+  Modified Time: 747
+  Reference Count: 2
+  Registered Events: (none)
+  Elements:
+    -0.497162 0.867658 0 0.10939
+    -0.867658 -0.497162 0 0.0755573
+    0 0 1 0.011988
+    0 0 0 1
+
+
+vtkMatrix4x4 (0x2cfe870)
+  Debug: Off
+  Modified Time: 1317
+  Reference Count: 2
+  Registered Events: (none)
+  Elements:
+    0.24717 0.431367 0.867658 -0.0700324
+    0.431367 0.75283 -0.497162 -0.0981091
+    -0.867658 0.497162 1.11022e-16 0.0350991
+    0 0 0 1
+
+
+make -f exec.zz15cL1.makefile all post
+/home/ire/IrreversibleElectroporationSpine/Code/ireSolver -run_type full -dim 3 -petscspace_order 1 -variable_coefficient field  -snes_t
+ype ksponly  -snes_monitor -snes_converged_reason -ksp_converged_reason -ksp_rtol 1.e-6 -pc_type bjacobi -info -info_exclude null,pc,vec
+,mat -f meshIREmidres.e -vtk '15C001_1.26.20/15C001 - L1 redo_real/L1Segmentation_EMelectric_conductivity.2700.29.34.vtk' -sourcelandmar
+k zz15cL1/sourcelandmarks.electric_conductivity.2700.29.34.vtk -targetlandmark zz15cL1/targetlandmarks.electric_conductivity.2700.29.34.
+vtk -electric_conductivity  1.00000e-01,0.100000,0.020000,2.000000,0.012000,2.000000,0.230000 -voltage 2700.000000 -dataid zz15cL1/elect
+ric_conductivity.2700.29.34
+Unexpected end of /proc/mounts line `overlay / overlay rw,relatime,lowerdir=/var/lib/docker/overlay2/l/ZUVRMDSR7H2YNX3QLEC65PLCCC:/var/l
+ib/docker/overlay2/l/JJNCXWIYMNKLQLS2XWKWJLBQNN:/var/lib/docker/overlay2/l/LP2UW47BS4MUORSZXNYWDPSXS6:/var/lib/docker/overlay2/l/7B3T7JJ
+TEX6FYHFZNJ7QFW2ZX6:/var/lib/docker/overlay2/l/4A6CNPJJTQ5AV4JU5QIOKDTTNQ:/var/lib/docker/overlay2/l/FWBXTTXAIDIEDIUQGOKS2LPECY:/var/lib
+/docker/overlay2/l/OPM4NJIIFNNPZVXUHTMNHT5VWY:/var/lib/docker/overlay2/l/JQBTRNTT2IT3RYZ3MYKJP3VYD6:/var/lib/docker/overlay2/l/4HYI2OP3C
+2YI4'
+Unexpected end of /proc/mounts line `VGRLEJ6ASMFFA:/var/lib/docker/overlay2/l/IZRLT5GKNEJPBO6MSN2O3DWUIW:/var/lib/docker/overlay2/l/TAVS
+OWKLJX3PDTCNJ7PY3GJZ6F:/var/lib/docker/overlay2/l/BVRIYRDENGPILMW5ZL4ALLSZNJ:/var/lib/docker/overlay2/l/O5TKRPDIYD7TPE72MXB6IKCD2A:/var/
+lib/docker/overlay2/l/W7LRQSKWGP2DQNLEKF4BY5OSPG:/var/lib/docker/overlay2/l/3ENNOVEFY2J25J6ELY7N7J3KWB:/var/lib/docker/overlay2/l/FSZ3CG
+5LYGGGNFLQLHF4H56FRG:/var/lib/docker/overlay2/l/73ENBNGYQMGCMHDE4QNP2DOQTI:/var/lib/docker/overlay2/l/MPBWF5ITLUI3EZUYCOUIU6JCAJ:/var/li
+b/do'
+Unexpected end of /proc/mounts line `cker/overlay2/l/BZVG33KGAMBR5Q4CMIKBUB7I3P:/var/lib/docker/overlay2/l/OEV5HF7OEJWQWF67VAFA66ATFI:/v
+ar/lib/docker/overlay2/l/SLHEDTNNQ4XVPDH43CXMPFMZ6V:/var/lib/docker/overlay2/l/GVQUA65M4A4WW363M2ZO33IQ6L:/var/lib/docker/overlay2/l/NEW
+NOFWNBN4QPK7FQVO4Z7UXD7:/var/lib/docker/overlay2/l/AEPADBAY2H6Z7MD5S6HJDLTMI5,upperdir=/var/lib/docker/overlay2/81e5806af68ea0f33c7cbb80
+1d34a593d62e706027722ad1f10c4ff57f0aa5d0/diff,workdir=/var/lib/docker/overlay2/81e5806af68ea0f33c7cbb801d34a593d62e706027722ad1f10c4ff57
+f0aa'
+opening file...
+Debug: Off
+Modified Time: 345
+Reference Count: 2
+Registered Events: (none)
+Source: (none)
+Information: 0x1175800
+Data Released: False
+Global Release Data: Off
+UpdateTime: 358
+Release Data: Off
+UpdateExtent: Not Initialized
+UpdateExtent: 0, 511, 0, 511, 0, 6
+CombinedUpdateExtent: 0, -1, 0, -1, 0, -1
+WholeExtent: 0, 511, 0, 511, 0, 6
+ExtentTranslator: (0x1177970)
+RequestExactExtent: Off
+ Field Data:
+  Debug: Off
+  Modified Time: 160
+  Reference Count: 1
+  Registered Events: (none)
+  Number Of Arrays: 0
+  Number Of Components: 0
+  Number Of Tuples: 0
+Number Of Points: 1835008
+Number Of Cells: 1566726
+Cell Data:
+  Debug: Off
+  Modified Time: 341
+  Reference Count: 1
+  Registered Events: (none)
+  Number Of Arrays: 0
+  Number Of Components: 0
+  Number Of Tuples: 0
+  Copy Tuple Flags: ( 1 1 1 1 1 0 1 1 )
+  Interpolate Flags: ( 1 1 1 1 1 0 0 1 )
+  Pass Through Flags: ( 1 1 1 1 1 1 1 1 )
+  Scalars: (none)
+  Vectors: (none)
+  Normals: (none)
+  TCoords: (none)
+  Tensors: (none)
+  GlobalIds: (none)
+  PedigreeIds: (none)
+  EdgeFlag: (none)
+Point Data:
+  Debug: Off
+  Modified Time: 345
+  Reference Count: 1
+  Registered Events: (none)
+  Number Of Arrays: 1
+  Array 0 name = scalars
+  Number Of Components: 1
+  Number Of Tuples: 1835008
+  Copy Tuple Flags: ( 1 1 1 1 1 0 1 1 )
+  Interpolate Flags: ( 1 1 1 1 1 0 0 1 )
+  Pass Through Flags: ( 1 1 1 1 1 1 1 1 )
+  Scalars:
+    Debug: Off
+    Modified Time: 309
+    Reference Count: 1
+    Registered Events: (none)
+    Name: scalars
+    Data type: float
+    Size: 1835008
+    MaxId: 1835007
+    NumberOfComponents: 1
+    Information: 0
+    Name: scalars
+    Number Of Components: 1
+    Number Of Tuples: 1835008
+    Size: 1835008
+    MaxId: 1835007
+    LookupTable: (none)
+    Array: 0x7fc32ac94010
+  Vectors: (none)
+  Normals: (none)
+  TCoords: (none)
+  Tensors: (none)
+  GlobalIds: (none)
+  PedigreeIds: (none)
+  EdgeFlag: (none)
+Bounds:
+  Xmin,Xmax: (0, 0.179872)
+  Ymin,Ymax: (0, 0.179872)
+  Zmin,Zmax: (0, 0.023976)
+Compute Time: 0
+ScalarType: 10
+NumberOfScalarComponents: 1
+Spacing: (0.000352, 0.000352, 0.003996)
+Origin: (0, 0, 0)
+Dimensions: (512, 512, 7)
+Increments: (0, 0, 0)
+Extent: (0, 511, 0, 511, 0, 6)
+ZBounds [0.000000,0.023976]
+Debug: Off
+Modified Time: 639
+Reference Count: 1
+Registered Events: (none)
+Inverse: (0)
+Matrix: (0x1177a20)
+  Debug: Off
+  Modified Time: 660
+  Reference Count: 1
+  Registered Events: (none)
+  Elements:
+    0.247173 0.431368 -0.867656 0.0900848
+    0.431368 0.752827 0.497165 0.0866191
+    0.867656 -0.497165 1.66533e-16 0.011988
+    0 0 0 1
+Mode: RigidBody
+SourceLandmarks: 0x11780e0
+  Debug: Off
+  Modified Time: 552
+  Reference Count: 1
+  Registered Events: (none)
+  Data: 0x1179ed0
+  Data Array Name: Points
+  Number Of Points: 2
+  Bounds:
+    Xmin,Xmax: (0, 0)
+    Ymin,Ymax: (0, 0)
+    Zmin,Zmax: (0, 0.0055)
+TargetLandmarks: 0x117a120
+  Debug: Off
+  Modified Time: 621
+  Reference Count: 1
+  Registered Events: (none)
+  Data: 0x117b950
+  Data Array Name: Points
+  Number Of Points: 2
+  Bounds:
+    Xmin,Xmax: (0.0853127, 0.0900848)
+    Ymin,Ymax: (0.0866191, 0.0893535)
+    Zmin,Zmax: (0.011988, 0.011988)
+Electric Conductivity 0.100000,0.100000,0.020000,2.000000,0.012000,2.000000,0.230000
+Vertex 40908
+Transform Complete
+Writing Material...
+[0] DMGetDMSNES(): Creating new DMSNES
+[0] DMGetDMKSP(): Creating new DMKSP
+  0 SNES Function norm 3.308521426804e+00
+[0] SNESComputeJacobian(): Rebuilding preconditioner
+[0] KSPConvergedDefault(): Linear solver has converged. Residual norm 1.756720280892e-02 is less than relative tolerance 1.000000000000e-06 times initial right hand side norm 1.952796950431e+04 at iteration 210
+  Linear solve converged due to CONVERGED_RTOL iterations 210
+[0] SNESSolve_KSPONLY(): iter=0, linear solve iterations=210
+  1 SNES Function norm 9.703180521308e-06
+Nonlinear solve converged due to CONVERGED_ITS iterations 1
+Number of SNES iterations = 1
+L_2 Error: 14.0809
+python /home/ire/IrreversibleElectroporationSpine/Code/ireSolver.py --resample='15C001_1.26.20/15C001 - L1 redo_real/L1Segmentation_EM.vtk' --outputid=zz15cL1/electric_conductivity.2700.29.34
+resampling...
+vtkImageData (0x2a69010)
+  Debug: Off
+  Modified Time: 7643275
+  Reference Count: 2
+  Registered Events: (none)
+  Information: 0x2a68f10
+  Data Released: False
+  Global Release Data: Off
+  UpdateTime: 7643276
+  Field Data:
+    Debug: Off
+    Modified Time: 7643231
+    Reference Count: 1
+    Registered Events: (none)
+    Number Of Arrays: 0
+    Number Of Components: 0
+    Number Of Tuples: 0
+  Number Of Points: 1835008
+  Number Of Cells: 1566726
+  Cell Data:
+    Debug: Off
+    Modified Time: 7643268
+    Reference Count: 1
+    Registered Events: (none)
+    Number Of Arrays: 0
+    Number Of Components: 0
+    Number Of Tuples: 0
+    Copy Tuple Flags: ( 1 1 1 1 1 1 1 1 )
+    Interpolate Flags: ( 1 1 1 1 1 1 1 1 )
+    Pass Through Flags: ( 1 1 1 1 1 1 1 1 )
+    Scalars: (none)
+    Vectors: (none)
+    Normals: (none)
+    TCoords: (none)
+    Tensors: (none)
+    GlobalIds: (none)
+    PedigreeIds: (none)
+    EdgeFlag: (none)
+  Point Data:
+    Debug: Off
+    Modified Time: 7643275
+    Reference Count: 1
+    Registered Events: (none)
+    Number Of Arrays: 2
+    Array 0 name = vtkValidPointMask
+    Array 1 name = potential
+    Number Of Components: 2
+    Number Of Tuples: 1835008
+    Copy Tuple Flags: ( 1 1 1 1 1 1 1 1 )
+    Interpolate Flags: ( 1 1 1 1 1 1 1 1 )
+    Pass Through Flags: ( 1 1 1 1 1 1 1 1 )
+    Scalars:
+      Debug: Off
+      Modified Time: 7643270
+      Reference Count: 1
+      Registered Events: (none)
+      Name: potential
+      Data type: double
+      Size: 1835008
+      MaxId: 1835007
+      NumberOfComponents: 1
+      Information: 0
+      Name: potential
+      Number Of Components: 1
+      Number Of Tuples: 1835008
+      Size: 1835008
+      MaxId: 1835007
+      LookupTable: (none)
+      Array: 0x7fad59950010
+    Vectors: (none)
+    Normals: (none)
+    TCoords: (none)
+    Tensors: (none)
+    GlobalIds: (none)
+    PedigreeIds: (none)
+    EdgeFlag: (none)
+  Bounds:
+    Xmin,Xmax: (0, 0.179872)
+    Ymin,Ymax: (0, 0.179872)
+    Zmin,Zmax: (0, 0.023976)
+  Compute Time: 7643289
+  Spacing: (0.000352, 0.000352, 0.003996)
+  Origin: (0, 0, 0)
+  Dimensions: (512, 512, 7)
+  Increments: (0, 0, 0)
+  Extent: (0, 511, 0, 511, 0, 6)
+
+
+c3d zz15cL1/electric_conductivity.2700.29.34.vtk -o zz15cL1/electric_conductivity.2700.29.34.nii.gz;
+c3d zz15cL1/electric_conductivity.2700.29.34.vtk  '15C001_1.26.20/15C001 - L1 redo_real/L1Segmentation_EM.nerve.vtk' -lstat > zz15cL1/electric_conductivity.2700.29.34.txt
+echo root;head -n 1 zz15cL1/electric_conductivity.2700.29.34.txt; cat zz15cL1/electric_conductivity.2700.29.34.txt
+root
+LabelID        Mean        StdD         Max         Min       Count     Vol(mm^3)        Extent(Vox)
+LabelID        Mean        StdD         Max         Min       Count     Vol(mm^3)        Extent(Vox)
+    0      78.89952  1125.97794  21814.87064     0.00000     1664078         0.001    512   512     7
+    1     342.02707  2120.02125  53526.29478     0.00000      134353         0.000    273   174     7
+    2     593.29338  2182.95813  53277.84827     0.00000       29116         0.000    136   147     7
+    5      68.38959   145.94959  3129.47616     0.90317        3806         0.000     64    43     7
+    6      62.21527    42.33463   325.32375     1.31815        2899         0.000     30    27     7
+    9     175.26821    53.93926   280.71890    89.03037          28         0.000      4    10     1
+   11      17.06621    13.45160    53.63207     2.69886          39         0.000      8    10     1
+   24    2667.54277  4761.23662  14404.54507     0.00000         644         0.000    126    75     1
+   29     959.33860  1956.33877  5706.26420     0.00000          14         0.000      5     4     1
+   34       0.00000     0.00000     0.00000     0.00000          31         0.000      6     7     1
+
+
+
+View Solution
+=============
+
+itksnap -g zz15cL1/electric_conductivity.2700.29.34.vtk -s  '15C001_1.26.20/15C001 - L1 redo_real/L1Segmentation_EM.nerve.vtk'
+
+Example Solution
+=============
+
+  dockersolution.PNG
