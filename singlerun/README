@@ -1,0 +1,4 @@
+Usage
+=====
+
+docker run -it --rm -v $PWD:/data --user $(id -u):$(id -g) iresolver --ini=zz15cL1.ini
