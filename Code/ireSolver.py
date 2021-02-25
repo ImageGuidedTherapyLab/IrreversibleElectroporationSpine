@@ -248,7 +248,7 @@ if (options.config_ini != None):
         jobListPost.append('%s.post' % outputid  )
 
       # rsample back to image
-      fileHandle.write('\tpython ./ireSolver.py --resample=%s --outputid=%s/%s\n' %  (vtkimage,jobid,outputid) )
+      fileHandle.write('\tpython /home/ire/IrreversibleElectroporationSpine/Code/ireSolver.py --resample=%s --outputid=%s/%s\n' %  (vtkimage,jobid,outputid) )
 
       # avg in nerve root
       fileHandle.write('%s.post: \n' %   outputid  )
