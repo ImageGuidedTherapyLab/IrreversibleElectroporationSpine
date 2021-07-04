@@ -4,7 +4,7 @@ docker pull fuentesdt/iresolver:latest
 
 Linux
 =====
-docker run -it --rm -v $PWD:/data --user $(id -u):$(id -g) iresolver --ini=zz15cL1.ini
+docker run -it --rm -v $PWD:/data --user $(id -u):$(id -g) fuentesdt/iresolver:latest --ini=zz15cL1.ini
 
 Win10
 =====
