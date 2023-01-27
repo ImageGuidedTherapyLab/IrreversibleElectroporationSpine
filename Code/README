@@ -17,7 +17,7 @@ docker login --username=fuentesdt
 docker tag d79c73277914 fuentesdt/iresolver:latest
 docker push fuentesdt/iresolver
 
-docker run -it --rm -v $PWD:/data --user $(id -u):$(id -g) iresolver --ini=zz15cL1.ini
+docker run -it --rm -v $PWD:/data --user $(id -u):$(id -g)  -v /etc/passwd:/etc/passwd:ro -v /etc/group:/etc/group:ro  iresolver --ini=zz15cL1.ini
 
 
 DMPlexApplications
