@@ -11,6 +11,14 @@ Win10
 docker run -it --rm -v C:\Users\dtfuentes\GoogleDrive\github\IrreversibleElectroporationSpine\singlerun:/data  fuentesdt/iresolver:latest --ini=zz15cL1.ini
 
 
+2016-03__Studies/
+=====
+
+DicomSeriesReadImageWrite2 2016-03__Studies/MR/ 2016-03__Studies/image.nii.gz
+plastimatch convert --fixed 2016-03__Studies/image.nii.gz --output-labelmap 2016-03__Studies/label.nii.gz --input 2016-03__Studies/rtstruct/2.16.840.1.114362.1.12046989.25943054271.685070215.285.1.dcm
+
+docker run -it --rm -v $PWD:/data --user $(id -u):$(id -g) fuentesdt/iresolver:latest --ini=2016-03__Studies.ini
+docker run -it --rm -v $PWD:/data --user $(id -u):$(id -g) fuentesdt/iresolver:latest --ini=dog2L1.ini
 
 Expected Output
 ===============
