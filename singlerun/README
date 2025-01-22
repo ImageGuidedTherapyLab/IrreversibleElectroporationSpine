@@ -19,6 +19,7 @@ plastimatch convert --fixed 2016-03__Studies/image.nii.gz --output-labelmap 2016
 
 docker run -it --rm -v $PWD:/data --user $(id -u):$(id -g) fuentesdt/iresolver:latest --ini=2016-03__Studies.ini
 docker run -it --rm -v $PWD:/data --user $(id -u):$(id -g) fuentesdt/iresolver:latest --ini=dog2L1.ini
+docker run -it --rm -v $PWD:/data --user $(id -u):$(id -g) fuentesdt/iresolver:latest --ini=dog3L3.ini
 
 Expected Output
 ===============
