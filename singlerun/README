@@ -33,6 +33,8 @@ docker run -it --rm -v $PWD:/data --user $(id -u):$(id -g) fuentesdt/iresolver:l
 docker run -it --rm -v $PWD:/data --user $(id -u):$(id -g) fuentesdt/iresolver:latest --ini=dog3L5.ini
 docker run -it --rm -v $PWD:/data --user $(id -u):$(id -g) fuentesdt/iresolver:latest --ini=dog3T12.ini
 
+for idfile in dog*.ini; do docker run -it --rm -v $PWD:/data --user $(id -u):$(id -g) fuentesdt/iresolver:latest --ini=$idfile; done
+
 Expected Output
 ===============
 
