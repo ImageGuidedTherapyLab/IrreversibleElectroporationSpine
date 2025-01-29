@@ -35,6 +35,21 @@ docker run -it --rm -v $PWD:/data --user $(id -u):$(id -g) fuentesdt/iresolver:l
 
 for idfile in dog*.ini; do docker run -it --rm -v $PWD:/data --user $(id -u):$(id -g) fuentesdt/iresolver:latest --ini=$idfile; done
 
+head  -n 1 dog1L1/electric_conductivity.2700.75.76.txt
+grep '^   32' dog1L1/electric_conductivity.2700.75.76.txt
+grep '^   39' dog1L3/electric_conductivity.2700.78.79.txt
+grep '^   59' dog1L5/electric_conductivity.2700.81.82.txt
+grep '^    2' dog1T11/electric_conductivity.2700.69.70.txt
+grep '^   10' dog1T12/electric_conductivity.2700.72.73.txt
+grep '^    2' dog2L1/electric_conductivity.2700.45.46.txt
+grep '^    1' dog2L3/electric_conductivity.2700.47.48.txt
+grep '^    4' dog2L5/electric_conductivity.2700.49.50.txt
+grep '^    3' dog2T12/electric_conductivity.2700.32.34.txt
+grep '^   15' dog3L3/electric_conductivity.2700.53.54.txt  
+grep '^   24' dog3L5/electric_conductivity.2700.55.56.txt  
+grep '^   50' dog3T12/electric_conductivity.2700.47.52.txt 
+
+
 Expected Output
 ===============
 
