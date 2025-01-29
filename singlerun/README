@@ -35,6 +35,7 @@ docker run -it --rm -v $PWD:/data --user $(id -u):$(id -g) fuentesdt/iresolver:l
 
 for idfile in dog*.ini; do docker run -it --rm -v $PWD:/data --user $(id -u):$(id -g) fuentesdt/iresolver:latest --ini=$idfile; done
 
+echo 'bone tumor'
 head  -n 1 dog1L1/electric_conductivity.2700.75.76.txt
 grep '^   32' dog1L1/electric_conductivity.2700.75.76.txt
 grep '^   39' dog1L3/electric_conductivity.2700.78.79.txt
@@ -48,6 +49,52 @@ grep '^    3' dog2T12/electric_conductivity.2700.32.34.txt
 grep '^   15' dog3L3/electric_conductivity.2700.53.54.txt  
 grep '^   24' dog3L5/electric_conductivity.2700.55.56.txt  
 grep '^   50' dog3T12/electric_conductivity.2700.47.52.txt 
+
+echo 'Cord'
+head  -n 1 dog1L1/electric_conductivity.2700.75.76.txt
+grep '^   34' dog1L1/electric_conductivity.2700.75.76.txt
+grep '^   42' dog1L3/electric_conductivity.2700.78.79.txt
+grep '^   60' dog1L5/electric_conductivity.2700.81.82.txt
+grep '^    3' dog1T11/electric_conductivity.2700.69.70.txt
+grep '^   19' dog1T12/electric_conductivity.2700.72.73.txt
+grep '^   15' dog2L1/electric_conductivity.2700.45.46.txt
+grep '^   11' dog2L3/electric_conductivity.2700.47.48.txt
+grep '^    7' dog2L5/electric_conductivity.2700.49.50.txt
+grep '^   18' dog2T12/electric_conductivity.2700.32.34.txt
+grep '^   26' dog3L3/electric_conductivity.2700.53.54.txt  
+grep '^   25' dog3L5/electric_conductivity.2700.55.56.txt  
+grep '^    9' dog3T12/electric_conductivity.2700.47.52.txt 
+
+
+echo 'Nerve root left'
+head  -n 1 dog1L1/electric_conductivity.2700.75.76.txt
+grep '^   41' dog1L1/electric_conductivity.2700.75.76.txt
+grep '^   53' dog1L3/electric_conductivity.2700.78.79.txt
+grep '^   61' dog1L5/electric_conductivity.2700.81.82.txt
+grep '^    7' dog1T11/electric_conductivity.2700.69.70.txt
+grep '^   24' dog1T12/electric_conductivity.2700.72.73.txt
+grep '^   39' dog2L1/electric_conductivity.2700.45.46.txt
+grep '^   38' dog2L3/electric_conductivity.2700.47.48.txt
+grep '^   35' dog2L5/electric_conductivity.2700.49.50.txt
+grep '^   42' dog2T12/electric_conductivity.2700.32.34.txt
+grep '^   27' dog3L3/electric_conductivity.2700.53.54.txt  
+grep '^   35' dog3L5/electric_conductivity.2700.55.56.txt  
+grep '^   10' dog3T12/electric_conductivity.2700.47.52.txt 
+
+echo 'Nerve root right'
+head  -n 1 dog1L1/electric_conductivity.2700.75.76.txt
+grep '^   40' dog1L1/electric_conductivity.2700.75.76.txt
+grep '^   51' dog1L3/electric_conductivity.2700.78.79.txt
+grep '^   62' dog1L5/electric_conductivity.2700.81.82.txt
+grep '^    8' dog1T11/electric_conductivity.2700.69.70.txt
+grep '^   23' dog1T12/electric_conductivity.2700.72.73.txt
+grep '^   40' dog2L1/electric_conductivity.2700.45.46.txt
+grep '^   37' dog2L3/electric_conductivity.2700.47.48.txt
+grep '^   36' dog2L5/electric_conductivity.2700.49.50.txt
+grep '^   41' dog2T12/electric_conductivity.2700.32.34.txt
+grep '^   44' dog3L3/electric_conductivity.2700.53.54.txt  
+grep '^   46' dog3L5/electric_conductivity.2700.55.56.txt  
+grep '^   37' dog3T12/electric_conductivity.2700.47.52.txt 
 
 
 Expected Output
