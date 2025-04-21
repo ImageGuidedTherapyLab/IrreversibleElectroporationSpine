@@ -24,6 +24,7 @@ for iddog,myfile in enumerate(fileList):
 
 print("dog1L1.ini: tissue_replace = %s 1 %s 2 %s 3 %s 3 %s 3 %s 4 %s 5 %s 6  %s 6 %s 6" % (labeldictionary[1]['L1_muscle'], labeldictionary[1]['L1_bone'], labeldictionary[1]['L1_needle'], labeldictionary[1]['L1_needle_tip'], labeldictionary[1]['L1_needle_end'], labeldictionary[1]['L1_bone_tumor'], labeldictionary[1]['L1_CSF'], labeldictionary[1]['L1_cord'], labeldictionary[1]['L1_nerve_root_left'], labeldictionary[1]['L1_nerve_root_right']) )
 print("dog1L1.ini: voltageList = [   (2700,{'tip':%s, 'entry':%s, 'root':6, 'cord':6}) ]" % (labeldictionary[1]['L1_needle_tip'], labeldictionary[1]['L1_needle_end']) )
+print(' sed "s/^\s\+/dog1L1,/g;s/\s\+/,/g;s/LabelID/InstanceUID,LabelID/g;s/Vol(mm^3)/Vol.mm.3/g;s/Extent(Vox)/ExtentX,ExtentY,ExtentZ/g"  dog1L1/electric_conductivity.2700.%s.%s.txt' %(labeldictionary[1]['L1_needle_tip'], labeldictionary[1]['L1_needle_end']))
 
 print("dog1L3.ini: tissue_replace = %s 1 %s 2 %s 3 %s 3 %s 3 %s 4 %s 4 %s 5 %s 6  %s 6 %s 6" % (labeldictionary[1]['L3_muscle'], labeldictionary[1]['L3_bone'], labeldictionary[1]['L3_needle'], labeldictionary[1]['L3_needle_tip'], labeldictionary[1]['L3_needle_end'], labeldictionary[1]['L3_muscle_tumor'],labeldictionary[1]['L3_bone_tumor'], labeldictionary[1]['L3_CSF'], labeldictionary[1]['L3_cord'], labeldictionary[1]['L3_nerve_root_left'], labeldictionary[1]['L3_nerve_root_right']) )
 print("dog1L3.ini: voltageList = [   (2700,{'tip':%s, 'entry':%s, 'root':6, 'cord':6}) ]" % (labeldictionary[1]['L3_needle_tip'], labeldictionary[1]['L3_needle_end']) )
@@ -58,3 +59,6 @@ print("dog3L5.ini: voltageList = [   (2700,{'tip':%s, 'entry':%s, 'root':6, 'cor
 
 print("dog3T12.ini: tissue_replace = %s 1 %s 2 %s 3 %s 3 %s 3 %s 4 %s 5 %s 6  %s 6 %s 6" % (labeldictionary[3]['T12_muscle'], labeldictionary[3]['T12_bone'], labeldictionary[3]['T12_needle'], labeldictionary[3]['T12_needle_center'], labeldictionary[3]['T12_needle_end'], labeldictionary[3]['T12_bone_tumor'], labeldictionary[3]['CSF'], labeldictionary[3]['T12_cord'], labeldictionary[3]['T12_nerve_root_left'], labeldictionary[3]['T11_nerve_root_right']) )
 print("dog3T12.ini: voltageList = [  (2700,{'tip':%s, 'entry':%s, 'root':6, 'cord':6}) ]" % (labeldictionary[3]['T12_needle_center'], labeldictionary[3]['T12_needle_end']) )
+
+
+print('sqlite3 $(SQLITEDB)  -init .loadcsvsqliterc ".import $< lstat"')
