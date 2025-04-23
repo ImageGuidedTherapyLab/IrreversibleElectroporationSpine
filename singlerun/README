@@ -10,6 +10,19 @@ Win10
 =====
 docker run -it --rm -v C:\Users\dtfuentes\GoogleDrive\github\IrreversibleElectroporationSpine\singlerun:/data  fuentesdt/iresolver:latest --ini=zz15cL1.ini
 
+usage
+=====
+python3 parseheader.py 
+c3d dog1.nrrd -o dogone/segmentation.nii.gz
+c3d dog2.nrrd -o dogtwo/segmentation.nii.gz
+c3d dog3.nrrd -o dogthree/segmentation.nii.gz
+for idfile in dog*.ini; do docker run -it --rm -v $PWD:/data --user $(id -u):$(id -g) fuentesdt/iresolver:latest --ini=$idfile; done
+for idfile in dog*.ini; do grep sed $idfile | cut -d= -f2; done
+
+sqlite3 efield.sql -init .loadcsvsqliterc ".import labeldictionary.csv labels"
+for idfile in dog*/*.csv; do sqlite3 efield.sql -init .loadcsvsqliterc ".import $idfile lstat" ; done
+sqlite3 efield.sql "select lb.labelID, ls.* from labels lb join lstat ls on  substr(ls.InstanceUID,1,4) =lb.UID and ls.LabelID = lb.label order by ls.InstanceUID,cast(ls.LabelID as integer)" > ire.csv
+
 
 2016-03__Studies/
 =====
@@ -19,8 +32,9 @@ plastimatch convert --fixed 2016-03__Studies/image.nii.gz --output-labelmap 2016
 
 docker run -it --rm -v $PWD:/data --user $(id -u):$(id -g) fuentesdt/iresolver:latest --ini=2016-03__Studies.ini
 
+depracated
+=============
 
-python parseheader.py 
 docker run -it --rm -v $PWD:/data --user $(id -u):$(id -g) fuentesdt/iresolver:latest --ini=dog1T12.ini
 docker run -it --rm -v $PWD:/data --user $(id -u):$(id -g) fuentesdt/iresolver:latest --ini=dog1T11.ini
 docker run -it --rm -v $PWD:/data --user $(id -u):$(id -g) fuentesdt/iresolver:latest --ini=dog1L1.ini
@@ -36,62 +50,7 @@ docker run -it --rm -v $PWD:/data --user $(id -u):$(id -g) fuentesdt/iresolver:l
 docker run -it --rm -v $PWD:/data --user $(id -u):$(id -g) fuentesdt/iresolver:latest --ini=dog3L5.ini
 docker run -it --rm -v $PWD:/data --user $(id -u):$(id -g) fuentesdt/iresolver:latest --ini=dog3T12.ini
 
-for idfile in dog*.ini; do docker run -it --rm -v $PWD:/data --user $(id -u):$(id -g) fuentesdt/iresolver:latest --ini=$idfile; done
 
-
-
-
-
-echo 'bone tumor'
-head  -n 1 dog1L1/electric_conductivity.2700.75.76.txt
-grep '^   32' dog1L1/electric_conductivity.2700.75.76.txt
-grep '^   39' dog1L3/electric_conductivity.2700.78.79.txt
-grep '^   59' dog1L5/electric_conductivity.2700.81.82.txt
-grep '^    2' dog1T11/electric_conductivity.2700.69.70.txt
-grep '^   10' dog1T12/electric_conductivity.2700.72.73.txt
-grep '^   35' dog2L1/electric_conductivity.2700.45.46.txt
-grep '^   21' dog2L3/electric_conductivity.2700.47.48.txt
-grep '^    8' dog2L5/electric_conductivity.2700.49.50.txt
-grep '^   47' dog2T12/electric_conductivity.2700.32.34.txt
-grep '^   15' dog3L3/electric_conductivity.2700.53.54.txt  
-grep '^   24' dog3L5/electric_conductivity.2700.55.56.txt  
-grep '^   50' dog3T12/electric_conductivity.2700.47.52.txt 
-echo 'Cord'
-head  -n 1 dog1L1/electric_conductivity.2700.75.76.txt
-grep '^   34' dog1L1/electric_conductivity.2700.75.76.txt
-grep '^   42' dog1L3/electric_conductivity.2700.78.79.txt
-grep '^   60' dog1L5/electric_conductivity.2700.81.82.txt
-grep '^    3' dog1T11/electric_conductivity.2700.69.70.txt
-grep '^   19' dog1T12/electric_conductivity.2700.72.73.txt
-grep '^   36' dog2L1/electric_conductivity.2700.45.46.txt
-grep '^   22' dog2L3/electric_conductivity.2700.47.48.txt
-grep '^   10' dog2L5/electric_conductivity.2700.49.50.txt
-grep '^   51' dog2T12/electric_conductivity.2700.32.34.txt
-grep '^   26' dog3L3/electric_conductivity.2700.53.54.txt  
-grep '^   25' dog3L5/electric_conductivity.2700.55.56.txt  
-grep '^    9' dog3T12/electric_conductivity.2700.47.52.txt 
-echo 'Nerve root left'
-head  -n 1 dog1L1/electric_conductivity.2700.75.76.txt
-grep '^   41' dog1L1/electric_conductivity.2700.75.76.txt
-grep '^   53' dog1L3/electric_conductivity.2700.78.79.txt
-grep '^   61' dog1L5/electric_conductivity.2700.81.82.txt
-grep '^    7' dog1T11/electric_conductivity.2700.69.70.txt
-grep '^   24' dog1T12/electric_conductivity.2700.72.73.txt
-grep '^    5' dog2L5/electric_conductivity.2700.49.50.txt
-grep '^   27' dog3L3/electric_conductivity.2700.53.54.txt  
-grep '^   35' dog3L5/electric_conductivity.2700.55.56.txt  
-grep '^   10' dog3T12/electric_conductivity.2700.47.52.txt 
-echo 'Nerve root right'
-head  -n 1 dog1L1/electric_conductivity.2700.75.76.txt
-grep '^   40' dog1L1/electric_conductivity.2700.75.76.txt
-grep '^   51' dog1L3/electric_conductivity.2700.78.79.txt
-grep '^   62' dog1L5/electric_conductivity.2700.81.82.txt
-grep '^    8' dog1T11/electric_conductivity.2700.69.70.txt
-grep '^   23' dog1T12/electric_conductivity.2700.72.73.txt
-grep '^    6' dog2L5/electric_conductivity.2700.49.50.txt
-grep '^   44' dog3L3/electric_conductivity.2700.53.54.txt  
-grep '^   46' dog3L5/electric_conductivity.2700.55.56.txt  
-grep '^   37' dog3T12/electric_conductivity.2700.47.52.txt 
 
 
 Expected Output
