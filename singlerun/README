@@ -16,6 +16,8 @@ python3 parseheader.py
 c3d dog1.nrrd -o dogone/segmentation.nii.gz
 c3d dog2.nrrd -o dogtwo/segmentation.nii.gz
 c3d dog3.nrrd -o dogthree/segmentation.nii.gz
+c3d dogone/segmentation.nii.gz dogone/dog_1_preabaltionMRI.nii.gz  -reslice-itk dog1shift.tfm -o dogone/dog1shift.nii.gz
+c3d dogone/dog1shift.nii.gz -spacing 0.000352x0.000352x0.00478mm -origin 0x0x0mm -o dogone/dog1shift.vtk
 for idfile in dog*.ini; do docker run -it --rm -v $PWD:/data --user $(id -u):$(id -g) fuentesdt/iresolver:latest --ini=$idfile; done
 for idfile in dog*.ini; do grep sed $idfile | cut -d= -f2; done
 
